@@ -44,7 +44,7 @@ Installation
 This will be available through `npm` once it reaches a stable state. While
 alpha, you can currently just download this git repo:
 
-   git clone git://github.com/TooTallNate/node-radio-stream.git
+    git clone git://github.com/TooTallNate/node-radio-stream.git
 
 
 [NodeJS]: http://nodejs.org
