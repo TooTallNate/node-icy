@@ -7,9 +7,9 @@ var url = "http://67.205.85.183:7714";
 //var url = "http://2133.live.streamtheworld.com:80/KFRCFMCMP3";
 // .977 The Comedy Channel - MP3 / 48k
 //var url = "http://icecast1.977music.com/comedy";
-// .977 The Comedy Channel - MP3 / 80k
-//var url = "http://icecast2.977music.com/comedy";
 // .977 The Comedy Channel - AAC / 48k
+//var url = "http://icecast2.977music.com/comedy";
+// .977 The Comedy Channel - MP3 / 80k
 //var url = "http://icecast3.977music.com/comedy";
 
 var stream = radio.createReadStream(url);
