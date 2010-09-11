@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>&lt;audio&gt; Client for "Simple Proxy": node-radio-stream</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/prototype/1.6.1.0/prototype.js"></script>
+    <script type="text/javascript">
+      function poll() {
+        new Ajax.Request("/metadata", {
+          onSuccess: function(r) {
+            $('events').innerHTML += r.responseText+"\n";
+          },
+          onFailure: function(r) {
+            console.error(r);
+          },
+          onComplete: function(r) {
+            console.log("complete");
+            poll();
+          }
+        })
+      }
+      poll();
+    </script>
+  </head>
+  <body style="text-align:center;">
+    <audio src="/stream" controls autoplay></audio>
+    <br />
+    <textarea id="events" style="width:500px;height:300px;">"metadata" events will be printed here...
+</textarea>
+  </body>
+</html>
