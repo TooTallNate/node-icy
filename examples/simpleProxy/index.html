@@ -8,7 +8,9 @@
       function poll() {
         new Ajax.Request("/metadata", {
           onSuccess: function(r) {
-            $('events').innerHTML += r.responseText+"\n";
+            if (r.responseText) {
+              $('events').innerHTML += r.responseText+"\n";
+            }
           },
           onFailure: function(r) {
             console.error(r);

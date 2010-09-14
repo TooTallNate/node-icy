@@ -7,11 +7,11 @@
  * appropriate name based off of the "metadata" event.
  *
  *   Usage:
- *     node examples/splitFileOnMetadata.js
+ *     node examples/splitFileOnMetadata/splitFileOnMetadata.js
  */
 var fs = require("fs");
-var radio = require("../lib/radio-stream");
-var stations = require("./radioStations");
+var radio = require("../../lib/radio-stream");
+var stations = require("../radioStations");
 
 var stream = radio.createReadStream(stations.random().url);
 
