@@ -1,0 +1,9 @@
+{
+  "name": "radio-stream",
+  "description": "An interface for connecting to, parsing metadata, and reading from SHOUTcast/Icecast radio streams",
+  "version": "0.0.1",
+  "author": "Nathan Rajlich <nathan@tootallnate.net>",
+  "keywords": ["SHOUTcast", "Icecast", "Radio", "Internet", "Metadata", "ReadStream"],
+  "main": "./lib/radio-stream",
+  "engines": { "node": ">= 0.2.0" }
+}
