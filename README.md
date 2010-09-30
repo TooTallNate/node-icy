@@ -14,20 +14,24 @@ Usage
 Here's a basic example of just piping the clean audio data to _stdout_,
 while printing the HTTP response headers and metadata events to _stderr_:
 
+    var sys = require("sys");
     var radio = require("radio-stream");
 
+    var url = "http://67.205.85.183:7714";
     var stream = radio.createReadStream(url);
 
     stream.on("connect", function() {
       console.error("Radio Stream connected!");
       console.error(stream.headers);
     });
-    stream.on("data", function(chunk) {
-      process.stdout.write(chunk);
-    });
+
+    // When a 'metadata' event happens, usually a new song is starting.
     stream.on("metadata", function(title) {
       console.error(title);
     });
+
+    // Proxy the raw audio stream to 'stdout', redirect to a file!
+    sys.pump(stream, process.stdout);
 
 Look in the `examples` directory for code of some more complex use-cases.
 
