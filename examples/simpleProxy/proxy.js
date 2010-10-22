@@ -46,6 +46,25 @@ stream.on("data", function(chunk) {
   pcm.stdin.write(chunk);
 });
 
+// A simple "Burst-on-Connect" implementation. We'll store the previous 2mb
+// of raw PCM data, and send it each time a new connection is made.
+var bocData = [];
+var bocSize = 2097152; // 2mb in bytes
+pcm.stdout.on("data", function(chunk) {
+  while (currentBocSize() > bocSize) {
+    bocData.shift();
+  }
+  bocData.push(chunk);
+  //console.error(currentBocSize());
+});
+function currentBocSize() {
+  var size = 0, i=0, l=bocData.length;
+  for (; i<l; i++) {
+    size += bocData[i].length;
+  }
+  return size;
+}
+
 // Now we create the HTTP server.
 var httpPort = 36867;
 http.createServer(function(req, res) {
@@ -74,64 +93,128 @@ http.createServer(function(req, res) {
       stream.on("connect", connected);
     }
 
+  // If "/stream.mp3" is requested, fire up an MP3 encoder (lame), and start
+  // streaming the MP3 data to the client.
   } else if (req.url == "/stream.mp3") {
-      res.writeHead(200, {
-        "Content-Type": "audio/mpeg",
-        "Connection": "close",
-        "Transfer-Encoding": "identity"
-      });
-      var mp3 = spawn("lame", [
-        "-S", "-r", "-s", "48", "-", "-"
-      ]);
-      var callback = function(chunk) {
-        mp3.stdin.write(chunk);
+    var mp3 = spawn("lame", [
+      "-S", // Operate silently (nothing to stderr)
+      "-r", // Input is raw PCM
+      "-s", "48", // Input sampling rate: 48,000
+      "-", // Input from stdin
+      "-" // Output to stderr
+    ]);
+    mp3.on("exit", function(exitCode) {
+      console.error("mp3.onExit: "+ exitCode);
+    });
+    mp3.on("error", function(error) {
+      console.error("mp3.onError: ", error);
+    });
+    mp3.stdin.on("error", function(error) {
+      console.error("mp3.stdin.onError: ", error);
+    });
+    mp3.stdout.on("error", function(error) {
+      console.error("mp3.stdout.onError: ", error);
+    });
+    mp3.stdout.on("data", function(chunk) {
+      // Send the response header on the first MP3 'data' event.
+      if (!res.headerWritten) {
+        res.headerWritten = true;
+        res.writeHead(200, {
+          "Content-Type": "audio/mpeg",
+          "Connection": "close",
+          "Transfer-Encoding": "identity"
+        });
       }
-      mp3.stdout.on("data", function(chunk) {
-        res.write(chunk);
-      });
-      pcm.stdout.on("data", callback);
-      req.connection.on("close", function() {
-        // This occurs when the HTTP client closes the connection.
-        pcm.stdout.removeListener("data", callback);
-        mp3.kill();
-      });      
- 
+      res.write(chunk);
+    });
+
+    // First, send what's inside the "Burst-on-Connect" buffers.
+    for (var i=0, l=bocData.length; i<l; i++) {
+      mp3.stdin.write(bocData[i]);
+    }
+
+    // Then start sending the incoming PCM data to the MP3 encoder
+    var callback = function(chunk) {
+      mp3.stdin.write(chunk);
+    }
+    pcm.stdout.on("data", callback);
+
+    req.connection.on("close", function() {
+      // This occurs when the HTTP client closes the connection.
+      pcm.stdout.removeListener("data", callback);
+      mp3.kill();
+    });      
+
+  // If "/stream.ogg" is requested, fire up an OGG encoder (oggenc), and start
+  // streaming the OGG vorbis data to the client.
   } else if (req.url == "/stream.ogg") {
-      res.writeHead(200, {
-        "Content-Type": "application/ogg",
-        "Connection": "close",
-        "Transfer-Encoding": "identity"
-      });
-      var ogg = spawn("oggenc", [
-        "--silent", // Silent operation
-        "-r", // Raw input
-        "--ignorelength", // Ignore length
-        "--raw-rate=48000", // Raw input rate: 48000
-        "-" // Input from stdin, Output to stderr
-      ]);
-      var callback = function(chunk) {
-        ogg.stdin.write(chunk);
+    var ogg = spawn("oggenc", [
+      "--silent", // Operate silently (nothing to stderr)
+      "-r", // Raw input
+      "--ignorelength", // Ignore length
+      "--raw-rate=48000", // Raw input rate: 48000
+      "-" // Input from stdin, Output to stderr
+    ]);
+    ogg.on("exit", function(exitCode) {
+      console.error("ogg.onExit: "+ exitCode);
+    });
+    ogg.on("error", function(error) {
+      console.error(error);
+    });
+    ogg.stdin.on("error", function(error) {
+      console.error("ogg.stdin.onError: ", error);
+    });
+    ogg.stdout.on("error", function(error) {
+      console.error("ogg.stdout.onError: ", error);
+    });
+    ogg.stdout.on("data", function(chunk) {
+      // Send the response header on the first OGG 'data' event.
+      if (!res.headerWritten) {
+        res.headerWritten = true;
+        res.writeHead(200, {
+          "Content-Type": "application/ogg",
+          "Connection": "close",
+          "Transfer-Encoding": "identity"
+        });
       }
-      ogg.stdout.on("data", function(chunk) {
-        res.write(chunk);
-      });
-      pcm.stdout.on("data", callback);
-      req.connection.on("close", function() {
-        // This occurs when the HTTP client closes the connection.
-        pcm.stdout.removeListener("data", callback);
-        ogg.kill();
-      });      
- 
+      res.write(chunk);
+    });
+
+    // First, send what's inside the "Burst-on-Connect" buffers.
+    for (var i=0, l=bocData.length; i<l; i++) {
+      ogg.stdin.write(bocData[i]);
+    }
+
+    // Then start sending the incoming PCM data to the OGG encoder
+    var callback = function(chunk) {
+      ogg.stdin.write(chunk);
+    }
+    pcm.stdout.on("data", callback);
+
+    req.connection.on("close", function() {
+      // This occurs when the HTTP client closes the connection.
+      pcm.stdout.removeListener("data", callback);
+      ogg.kill();
+    });
+
+  // If "/metadata" is requested, then hold of on sending any response, but
+  // request the `radio.Stream` instance to notify the request of the next
+  // 'metadata' event.
   } else if (req.url == "/metadata") {
     req.connection.setTimeout(0); // Disable timeouts
     var callback = function(metadata) {
       stream.removeListener("metadata", callback);
+      var response = radio.parseMetadata(metadata).StreamTitle;
       res.writeHead(200, {
-        'Content-Type':'application/json'
+        'Content-Type': 'text/plain',
+        'Content-Length': Buffer.byteLength(response)
       });
-      res.end(radio.parseMetadata(metadata).StreamTitle);
+      res.end(response);
     }
+    // TODO: Use `EventEmitter#once` when 0.3 lands.
     stream.on("metadata", callback);
+
+  // Otherwise just serve the "index.html" file.
   } else {
     fs.readFile(__dirname + "/index.html", function(err, buffer) {
       res.writeHead(200, {
@@ -141,7 +224,13 @@ http.createServer(function(req, res) {
       res.end(buffer);
     });
   }
+
 }).listen(httpPort, function() {
   console.error("HTTP server started on port: " + httpPort);
 });
 
+
+// Shouldn't be needed; just in case...
+process.on("uncaughtException", function(ex) {
+  console.error("Uncaught Exception: ", ex);
+});
