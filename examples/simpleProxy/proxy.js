@@ -2,7 +2,7 @@
  * This example script demonstrates a basic proxy of the audio and metadata
  * through a Node HTTP server. The command-line tools `lame` and `oggenc` are
  * required for this to work. Invoking this script will start the HTTP server
- * on port 36867. If the browser requests:
+ * on port 8080. If the browser requests:
  *
  *    "/"           - The index page will be returned.
  *    "/stream"     - Returns the raw PCM data from the transcoded input radio stream.
@@ -20,15 +20,27 @@ var fs = require("fs");
 var http = require("http");
 var spawn = require("child_process").spawn;
 var radio = require("../../lib/radio-stream");
+var stations = require("../radioStations");
 
 // If you pass a URL to a SHOUTcast/Icecast stream, then we'll use that,
 // otherwise get a random one from the "radioStations.json" file.
-var station = process.argv[2] || require("../radioStations").random().url;
-console.error("Connecting to: " + station);
+var station;
+if (process.argv[2]) {
+  station = stations.fromName(process.argv[2]);
+  if (!station) station = process.argv[2];
+} else {
+  //station = stations.random().url;
+  station = stations.fromName("4 Ever Floyd");
+}
+console.error("Connecting to:");
+console.error(station);
+
+// The port the HTTP proxy server is going to be listening on:
+var port = 8080;
 
 // Connect to the remote radio stream, and pass the raw audio data to any
 // client requesting the "/stream" URL (will be an <audio> tag).
-var stream = radio.createReadStream(station);
+var stream = radio.createReadStream(station.url);
 
 // Decode the MP3 stream to raw PCM data, signed 16-bit Little-endian
 var pcm = spawn("lame", [
@@ -66,7 +78,6 @@ function currentBocSize() {
 }
 
 // Now we create the HTTP server.
-var httpPort = 36867;
 http.createServer(function(req, res) {
 
   // If the client simple requests 'stream', then send back the raw PCM data.
@@ -225,9 +236,8 @@ http.createServer(function(req, res) {
     });
   }
 
-}).listen(httpPort, function() {
-  console.error("HTTP server started on port: " + httpPort);
-});
+}).listen(port);
+console.error("HTTP server listening at: http://*:" + port);
 
 
 // Shouldn't be needed; just in case...
