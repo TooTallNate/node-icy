@@ -8,41 +8,38 @@
       window.onload = function() {
 
         // This 'poll()' function polls for 'metadata' events from the radio stream
-        function poll() {
+        function poll(force) {
+          var headers = {};
+          if (force) headers['X-Current-Track'] = 1;
           new Ajax.Request("/metadata", {
             onSuccess: function(r) {
               if (r.responseText) {
-                $('events').innerHTML += r.responseText+"\n";
+                $('events').innerHTML += r.responseText + "\n";
               }
+              poll();
             },
             onFailure: function(r) {
               console.error(r);
             },
-            onComplete: function(r) {
-              console.log("complete");
-              poll();
-            }
-          })
+            requestHeaders: headers
+          });
         }
-        poll();
+        poll(true);
 
         // We'll use 'canPlayType' to determine which file format to request
         var audio = $$("audio")[0];
-        var src = "/stream.";
-        if (audio.canPlayType('application/ogg; codecs="vorbis"') == "probably") {
-          src += "ogg";
-        } else {
-          src += "mp3";
+        if (audio.canPlayType('application/ogg; codecs="vorbis"') == "probably"
+            && (/Chrome/i.test(navigator.userAgent) || !/Safari/i.test(navigator.userAgent))) {
+          audio.src = "/stream.ogg";
         }
-        console.log("loading " + src);
-        audio.src = src;
+        console.log("loading " + audio.src);
         audio.load();
-        audio.play();
+        audio.play();*/
       }
     </script>
   </head>
   <body style="text-align:center;">
-    <audio controls></audio>
+    <audio src="/stream.mp3" controls></audio>
     <br />
     <textarea id="events" style="width:500px;height:300px;">"metadata" events will be printed here...
 </textarea>

@@ -42,6 +42,13 @@ var port = 8080;
 // client requesting the "/stream" URL (will be an <audio> tag).
 var stream = radio.createReadStream(station.url);
 
+// If the remote connection to the radio stream closes, then just shutdown the
+// server and print an error. Do something more elegant in a real world scenario.
+stream.on("close", function() {
+  console.error("Connection to '"+station.name+"' was closed!");
+  process.exit(1);
+});
+
 // Decode the MP3 stream to raw PCM data, signed 16-bit Little-endian
 var pcm = spawn("lame", [
   "-S", // Operate silently (nothing to stderr)
@@ -76,6 +83,13 @@ function currentBocSize() {
   }
   return size;
 }
+
+// We have to keep track of the currently playing song, so that we can
+// respond when "/metadata" is requested with an "X-Current-Track" header.
+var currentTrack;
+stream.on("metadata", function(metadata) {
+  currentTrack = radio.parseMetadata(metadata).StreamTitle;
+});
 
 // Now we create the HTTP server.
 http.createServer(function(req, res) {
@@ -213,17 +227,25 @@ http.createServer(function(req, res) {
   // 'metadata' event.
   } else if (req.url == "/metadata") {
     req.connection.setTimeout(0); // Disable timeouts
-    var callback = function(metadata) {
-      stream.removeListener("metadata", callback);
-      var response = radio.parseMetadata(metadata).StreamTitle;
+    if (req.headers['x-current-track'] && currentTrack) {
       res.writeHead(200, {
         'Content-Type': 'text/plain',
-        'Content-Length': Buffer.byteLength(response)
+        'Content-Length': Buffer.byteLength(currentTrack)
       });
-      res.end(response);
+      res.end(currentTrack);
+    } else {
+      var callback = function(metadata) {
+        stream.removeListener("metadata", callback);
+        var response = radio.parseMetadata(metadata).StreamTitle;
+        res.writeHead(200, {
+          'Content-Type': 'text/plain',
+          'Content-Length': Buffer.byteLength(response)
+        });
+        res.end(response);
+      }
+      // TODO: Use `EventEmitter#once` when 0.3 lands.
+      stream.on("metadata", callback);
     }
-    // TODO: Use `EventEmitter#once` when 0.3 lands.
-    stream.on("metadata", callback);
 
   // Otherwise just serve the "index.html" file.
   } else {
