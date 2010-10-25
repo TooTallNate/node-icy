@@ -234,17 +234,14 @@ http.createServer(function(req, res) {
       });
       res.end(currentTrack);
     } else {
-      var callback = function(metadata) {
-        stream.removeListener("metadata", callback);
+      stream.once("metadata", function(metadata) {
         var response = radio.parseMetadata(metadata).StreamTitle;
         res.writeHead(200, {
           'Content-Type': 'text/plain',
           'Content-Length': Buffer.byteLength(response)
         });
         res.end(response);
-      }
-      // TODO: Use `EventEmitter#once` when 0.3 lands.
-      stream.on("metadata", callback);
+      });
     }
 
   // Otherwise just serve the "index.html" file.
