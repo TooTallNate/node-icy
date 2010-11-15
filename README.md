@@ -1,11 +1,16 @@
-node-radio-stream
-=================
-### A [NodeJS][] interface for connecting to, parsing metadata, and reading from SHOUTcast/Icecast radio streams.
+node-icecast-stack
+==================
+### A [StreamStack][] implementation for parsing and/or injecting metadata with SHOUTcast/Icecast radio streams.
 
 This module offers an interface for retrieving the raw audio data and
-parsing the metadata from an [SHOUTcast][] or [Icecast][] broadcast. The
-exposed API is offered as a [ReadStream](http://nodejs.org/api.html#readable-stream-22)
-for compatibility and flexibility with [Node][NodeJS]'s other `Stream` interfaces.
+parsing the metadata from a [SHOUTcast][] or [Icecast][] broadcast. Two API's
+are offered: a low-level [StreamStack][] read and write interface (which
+requires you to establish the connection to the `net.Stream` yourself), and a
+more convenient high-level
+[ReadStream](http://nodejs.org/api.html#readable-stream-23) and
+[WriteStream](http://nodejs.org/api.html#writable-stream-34) interface (which
+use create a `net.Stream` connection, and use the StreamStack interfaces to
+transparently ).
 
 
 Usage
@@ -14,24 +19,30 @@ Usage
 Here's a basic example of just piping the clean audio data to _stdout_,
 while printing the HTTP response headers and metadata events to _stderr_:
 
-    var sys = require("sys");
-    var radio = require("radio-stream");
+    var icecase = require('icecast-stack');
 
-    var url = "http://67.205.85.183:7714";
-    var stream = radio.createReadStream(url);
+    var url = 'http://67.205.85.183:7714'; // URL to a known Icecast stream
+    var stream = icecast.createReadStream(url);
 
-    stream.on("connect", function() {
+    // Fired when the `net.Stream` has it's 'connect' event.
+    stream.on('connect', function() {
       console.error("Radio Stream connected!");
-      console.error(stream.headers);
+    });
+    
+    // Fired after the HTTP response headers have been received.
+    stream.on('response', function(res) {
+      console.error("Radio Stream response!");
+      console.error(res.headers);
     });
 
     // When a 'metadata' event happens, usually a new song is starting.
-    stream.on("metadata", function(title) {
-      console.error(title);
+    stream.on('metadata', function(metadata) {
+      icecast.parseMetadata(metadata);
+      console.error();
     });
 
     // Proxy the raw audio stream to 'stdout', redirect to a file!
-    sys.pump(stream, process.stdout);
+    stream.pipe(process.stdout);
 
 Look in the `examples` directory for code of some more complex use-cases.
 
@@ -46,15 +57,16 @@ Installation
 ------------
 
 Installation through [__npm__](http://github.com/isaacs/npm) is the most
-straight-forward way to install the `node-radio-stream` module:
+straight-forward way to install the `node-icecast-stack` module:
 
-    npm install radio-stream
+    npm install icecast-stack
 
 Or just checking out this _git_ repo works as well:
 
-    git clone git://github.com/TooTallNate/node-radio-stream.git
+    git clone git://github.com/TooTallNate/node-icecast-stack.git
 
 
 [NodeJS]: http://nodejs.org
+[StreamStack]: http://github.com/TooTallNate/node-stream-stack
 [SHOUTcast]: http://www.shoutcast.com/
 [Icecast]: http://icecast.org/
