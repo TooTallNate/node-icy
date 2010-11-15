@@ -19,7 +19,7 @@
 var fs = require("fs");
 var http = require("http");
 var spawn = require("child_process").spawn;
-var radio = require("../../lib/radio-stream");
+var icecast = require("../../lib/icecast-stack");
 var stations = require("../radioStations");
 
 // If you pass a URL to a SHOUTcast/Icecast stream, then we'll use that,
@@ -40,7 +40,7 @@ var port = 8080;
 
 // Connect to the remote radio stream, and pass the raw audio data to any
 // client requesting the "/stream" URL (will be an <audio> tag).
-var stream = radio.createReadStream(station.url);
+var stream = icecast.createReadStream(station.url);
 
 // If the remote connection to the radio stream closes, then just shutdown the
 // server and print an error. Do something more elegant in a real world scenario.
@@ -59,7 +59,7 @@ var pcm = spawn("lame", [
   "-s", "48", // Sampling rate: 48,000
   "--bitwidth", "16", // Bits per Sample: 16
   "--signed", "--little-endian", // Signed, little-endian samples
-  "-" // Output to stderr
+  "-" // Output to stdout
 ]);
 stream.on("data", function(chunk) {
   pcm.stdin.write(chunk);
@@ -88,13 +88,14 @@ function currentBocSize() {
 // respond when "/metadata" is requested with an "X-Current-Track" header.
 var currentTrack;
 stream.on("metadata", function(metadata) {
-  currentTrack = radio.parseMetadata(metadata).StreamTitle;
+  currentTrack = icecast.parseMetadata(metadata).StreamTitle;
 });
 
 // Now we create the HTTP server.
 http.createServer(function(req, res) {
 
   // If the client simple requests 'stream', then send back the raw PCM data.
+  // I use this for debugging; piping the output to other command-line encoders.
   if (req.url == "/stream") {
     var connected = function() {
       var headers = {};
@@ -112,10 +113,10 @@ http.createServer(function(req, res) {
         pcm.stdout.removeListener("data", callback);
       });      
     }
-    if (stream.connected) {
+    if (stream.headers) {
       connected();
     } else {
-      stream.on("connect", connected);
+      stream.on("response", connected);
     }
 
   // If "/stream.mp3" is requested, fire up an MP3 encoder (lame), and start
@@ -223,7 +224,7 @@ http.createServer(function(req, res) {
     });
 
   // If "/metadata" is requested, then hold of on sending any response, but
-  // request the `radio.Stream` instance to notify the request of the next
+  // request the `icecast.ReadStream` instance to notify the request of the next
   // 'metadata' event.
   } else if (req.url == "/metadata") {
     req.connection.setTimeout(0); // Disable timeouts
@@ -235,7 +236,7 @@ http.createServer(function(req, res) {
       res.end(currentTrack);
     } else {
       stream.once("metadata", function(metadata) {
-        var response = radio.parseMetadata(metadata).StreamTitle;
+        var response = icecast.parseMetadata(metadata).StreamTitle;
         res.writeHead(200, {
           'Content-Type': 'text/plain',
           'Content-Length': Buffer.byteLength(response)

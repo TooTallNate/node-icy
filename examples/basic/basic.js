@@ -7,20 +7,18 @@
  *   Usage:
  *     node examples/basic/basic.js > out.mp3
  */
-var radio = require("../../lib/radio-stream");
+var icecast = require("../../lib/icecast-stack");
 var stations = require("../radioStations");
 
-var stream = radio.createReadStream(stations.random().url);
+var stream = icecast.createReadStream(stations.random().url);
 
-stream.on("connect", function() {
+stream.on("response", function() {
   console.error("Radio Stream connected!");
   console.error(stream.headers);
-});
-
-stream.on("data", function(chunk) {
-  process.stdout.write(chunk);
 });
 
 stream.on("metadata", function(title) {
   console.error(title);
 });
+
+stream.pipe(process.stdout);

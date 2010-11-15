@@ -10,10 +10,10 @@
  *     node examples/splitFileOnMetadata/splitFileOnMetadata.js
  */
 var fs = require("fs");
-var radio = require("../../lib/radio-stream");
+var icecast = require("../../lib/icecast-stack");
 var stations = require("../radioStations");
 
-var stream = radio.createReadStream(stations.random().url);
+var stream = icecast.createReadStream(stations.random().url);
 
 var currentFile;
 stream.on("data", function(chunk) {
@@ -23,7 +23,7 @@ stream.on("data", function(chunk) {
 });
 
 stream.on("metadata", function(metadata) {
-  var parsed = radio.parseMetadata(metadata);
+  var parsed = icecast.parseMetadata(metadata);
   console.error("Switching to: \"" + parsed.StreamTitle + ".mp3\"");
   if (currentFile) {
     currentFile.end();
