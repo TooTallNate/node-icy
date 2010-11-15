@@ -7,10 +7,9 @@ parsing the metadata from a [SHOUTcast][] or [Icecast][] broadcast. Two API's
 are offered: a low-level [StreamStack][] read and write interface (which
 requires you to establish the connection to the `net.Stream` yourself), and a
 more convenient high-level
-[ReadStream](http://nodejs.org/api.html#readable-stream-23) and
-[WriteStream](http://nodejs.org/api.html#writable-stream-34) interface (which
-use create a `net.Stream` connection, and use the StreamStack interfaces to
-transparently ).
+[ReadStream](http://nodejs.org/api.html#readable-stream-23) interface (which
+creates a `net.Stream` connection, and uses the `StreamStack` interfaces
+transparently).
 
 
 Usage
@@ -19,7 +18,7 @@ Usage
 Here's a basic example of just piping the clean audio data to _stdout_,
 while printing the HTTP response headers and metadata events to _stderr_:
 
-    var icecase = require('icecast-stack');
+    var icecast = require('icecast-stack');
 
     var url = 'http://67.205.85.183:7714'; // URL to a known Icecast stream
     var stream = icecast.createReadStream(url);
@@ -37,8 +36,8 @@ while printing the HTTP response headers and metadata events to _stderr_:
 
     // When a 'metadata' event happens, usually a new song is starting.
     stream.on('metadata', function(metadata) {
-      icecast.parseMetadata(metadata);
-      console.error();
+      var title = icecast.parseMetadata(metadata).StreamTitle;
+      console.error(title);
     });
 
     // Proxy the raw audio stream to 'stdout', redirect to a file!
