@@ -94,6 +94,9 @@ stream.on("metadata", function(metadata) {
 // Now we create the HTTP server.
 http.createServer(function(req, res) {
 
+  // Does the client support icecast metadata?
+  var acceptsMetadata = req.headers['icy-metadata'] == 1;
+
   // If the client simple requests 'stream', then send back the raw PCM data.
   // I use this for debugging; piping the output to other command-line encoders.
   if (req.url == "/stream") {
@@ -123,14 +126,13 @@ http.createServer(function(req, res) {
   // streaming the MP3 data to the client.
   } else if (req.url == "/stream.mp3") {
 
-    var acceptsMetadata = req.headers['icy-metadata'] == 1;
     var headers = {
       "Content-Type": "audio/mpeg",
       "Connection": "close",
       "Transfer-Encoding": "identity"
     };
     if (acceptsMetadata) {
-      headers['icy-name'] = "TEST!?!";
+      headers['icy-name'] = stream.headers['icy-name'];
       headers['icy-metaint'] = 10000;
     }
     res.writeHead(200, headers);
@@ -190,6 +192,27 @@ http.createServer(function(req, res) {
   // If "/stream.ogg" is requested, fire up an OGG encoder (oggenc), and start
   // streaming the OGG vorbis data to the client.
   } else if (req.url == "/stream.ogg") {
+
+    var headers = {
+      "Content-Type": "application/ogg",
+      "Connection": "close",
+      "Transfer-Encoding": "identity"
+    };
+    if (acceptsMetadata) {
+      headers['icy-name'] = stream.headers['icy-name'];
+      headers['icy-metaint'] = 10000;
+    }
+    res.writeHead(200, headers);
+    
+    if (acceptsMetadata) {
+      res = new icecast.IcecastWriteStack(res, 10000);
+      res.queueMetadata(currentTrack);
+      var metadataCallback = function(metadata) {
+        res.queueMetadata(metadata);
+      }
+      stream.on('metadata', metadataCallback);
+    }
+
     var ogg = spawn("oggenc", [
       "--silent", // Operate silently (nothing to stderr)
       "-r", // Raw input
@@ -210,15 +233,6 @@ http.createServer(function(req, res) {
       console.error("ogg.stdout.onError: ", error);
     });
     ogg.stdout.on("data", function(chunk) {
-      // Send the response header on the first OGG 'data' event.
-      if (!res.headerWritten) {
-        res.headerWritten = true;
-        res.writeHead(200, {
-          "Content-Type": "application/ogg",
-          "Connection": "close",
-          "Transfer-Encoding": "identity"
-        });
-      }
       res.write(chunk);
     });
 
@@ -237,6 +251,9 @@ http.createServer(function(req, res) {
       // This occurs when the HTTP client closes the connection.
       pcm.stdout.removeListener("data", callback);
       ogg.kill();
+      if (metadataCallback) {
+        stream.removeListener('metadata', metadataCallback);
+      }
     });
 
   // If "/metadata" is requested, then hold of on sending any response, but
@@ -278,5 +295,5 @@ console.error("HTTP server listening at: http://*:" + port);
 
 // Shouldn't be needed; just in case...
 process.on("uncaughtException", function(ex) {
-  console.error("Uncaught Exception: ", ex);
+  console.error("Uncaught Exception: ", ex.stack);
 });
