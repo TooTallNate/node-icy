@@ -122,6 +122,28 @@ http.createServer(function(req, res) {
   // If "/stream.mp3" is requested, fire up an MP3 encoder (lame), and start
   // streaming the MP3 data to the client.
   } else if (req.url == "/stream.mp3") {
+
+    var acceptsMetadata = req.headers['icy-metadata'] == 1;
+    var headers = {
+      "Content-Type": "audio/mpeg",
+      "Connection": "close",
+      "Transfer-Encoding": "identity"
+    };
+    if (acceptsMetadata) {
+      headers['icy-name'] = "TEST!?!";
+      headers['icy-metaint'] = 10000;
+    }
+    res.writeHead(200, headers);
+    
+    if (acceptsMetadata) {
+      res = new icecast.IcecastWriteStack(res, 10000);
+      res.queueMetadata(currentTrack);
+      var metadataCallback = function(metadata) {
+        res.queueMetadata(metadata);
+      }
+      stream.on('metadata', metadataCallback);
+    }
+
     var mp3 = spawn("lame", [
       "-S", // Operate silently (nothing to stderr)
       "-r", // Input is raw PCM
@@ -142,15 +164,6 @@ http.createServer(function(req, res) {
       console.error("mp3.stdout.onError: ", error);
     });
     mp3.stdout.on("data", function(chunk) {
-      // Send the response header on the first MP3 'data' event.
-      if (!res.headerWritten) {
-        res.headerWritten = true;
-        res.writeHead(200, {
-          "Content-Type": "audio/mpeg",
-          "Connection": "close",
-          "Transfer-Encoding": "identity"
-        });
-      }
       res.write(chunk);
     });
 
@@ -169,7 +182,10 @@ http.createServer(function(req, res) {
       // This occurs when the HTTP client closes the connection.
       pcm.stdout.removeListener("data", callback);
       mp3.kill();
-    });      
+      if (metadataCallback) {
+        stream.removeListener('metadata', metadataCallback);
+      }
+    });
 
   // If "/stream.ogg" is requested, fire up an OGG encoder (oggenc), and start
   // streaming the OGG vorbis data to the client.
