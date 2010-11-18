@@ -89,6 +89,7 @@ function currentBocSize() {
 var currentTrack;
 stream.on("metadata", function(metadata) {
   currentTrack = icecast.parseMetadata(metadata).StreamTitle;
+  console.error(currentTrack);
 });
 
 // Now we create the HTTP server.
@@ -292,8 +293,17 @@ http.createServer(function(req, res) {
 }).listen(port);
 console.error("HTTP server listening at: http://*:" + port);
 
-
-// Shouldn't be needed; just in case...
-process.on("uncaughtException", function(ex) {
-  console.error("Uncaught Exception: ", ex.stack);
+// You can manually simulate and send a 'metadata' event to the connected
+// clients by appending a line to the 'metadata' file in the
+// 'examples/simpleProxy' folder:
+//
+//    echo "New Song Title" >> ./examples/simpleProxy/metadata
+fs.watchFile(__dirname + "/metadata", function(o, n) {
+  if (o.mtime.getTime() != n.mtime.getTime()) {
+    fs.readFile(__dirname + "/metadata", function(err, data) {
+      var lines = data.toString().split('\n'), i=lines.length;
+      while (/\s+/.test(lines[--i])) {}
+      stream.emit('metadata', "StreamTitle='"+lines[i-1].trim()+"';");
+    });    
+  }
 });
