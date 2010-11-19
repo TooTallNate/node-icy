@@ -1,9 +1,19 @@
 {
   "name": "icecast-stack",
   "description": "A `StreamStack` implementation for parsing and/or injecting metadata with SHOUTcast/Icecast radio streams.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Nathan Rajlich <nathan@tootallnate.net>",
   "keywords": ["SHOUTcast", "Icecast", "Radio", "Internet", "Metadata", "ReadStream", "StreamStack"],
+  "dependencies": {
+    "stream-stack": "*",
+    "http-stack": "*"
+  },
+  "devDependencies" : {
+    "colors": ">= 0.3.0"
+  },
   "main": "./lib/icecast-stack",
+  "modules": {
+    "client": "./lib/client"
+  },
   "engines": { "node": ">= 0.3.0" }
 }
