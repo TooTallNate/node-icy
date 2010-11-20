@@ -16,10 +16,11 @@
  *   Usage:
  *     node examples/proxy.js [URL of Icecast Stream to proxy]
  */
+require("colors");
 var fs = require("fs");
 var http = require("http");
 var spawn = require("child_process").spawn;
-var icecast = require("../../lib/icecast-stack");
+var icecast = require("icecast-stack");
 var stations = require("../radioStations");
 
 // If you pass a URL to a SHOUTcast/Icecast stream, then we'll use that,
@@ -32,20 +33,17 @@ if (process.argv[2]) {
   //station = stations.random().url;
   station = stations.fromName("4 Ever Floyd");
 }
-console.error("Connecting to:");
-console.error(station);
-
-// The port the HTTP proxy server is going to be listening on:
-var port = 8080;
+console.error("Connecting to:".green.italic.bold);
+console.error(('  '+station.name.bold+': '+station.url).green);
 
 // Connect to the remote radio stream, and pass the raw audio data to any
 // client requesting the "/stream" URL (will be an <audio> tag).
-var stream = icecast.createReadStream(station.url);
+var stream = require('icecast-stack/client').createClient(station.url);
 
 // If the remote connection to the radio stream closes, then just shutdown the
 // server and print an error. Do something more elegant in a real world scenario.
 stream.on("close", function() {
-  console.error("Connection to '"+station.name+"' was closed!");
+  console.error(("Connection to '"+station.name+"' was closed!").red.bold);
   process.exit(1);
 });
 
@@ -74,7 +72,6 @@ pcm.stdout.on("data", function(chunk) {
     bocData.shift();
   }
   bocData.push(chunk);
-  //console.error(currentBocSize());
 });
 function currentBocSize() {
   var size = 0, i=0, l=bocData.length;
@@ -89,7 +86,7 @@ function currentBocSize() {
 var currentTrack;
 stream.on("metadata", function(metadata) {
   currentTrack = icecast.parseMetadata(metadata).StreamTitle;
-  console.error(currentTrack);
+  console.error(("Received 'metadata' event: ".bold + currentTrack).blue);
 });
 
 // Now we create the HTTP server.
@@ -290,20 +287,16 @@ http.createServer(function(req, res) {
     });
   }
 
-}).listen(port);
-console.error("HTTP server listening at: http://*:" + port);
+}).listen(8080, function() {
+  console.error(("HTTP Icecast proxy server listening at: ".bold + "http://*:" + this.address().port).cyan);
+  console.error(("Type a line and press enter to manually fire a "+"'metadata'".bold+" event").yellow);
+});
 
 // You can manually simulate and send a 'metadata' event to the connected
-// clients by appending a line to the 'metadata' file in the
-// 'examples/simpleProxy' folder:
-//
-//    echo "New Song Title" >> ./examples/simpleProxy/metadata
-fs.watchFile(__dirname + "/metadata", function(o, n) {
-  if (o.mtime.getTime() != n.mtime.getTime()) {
-    fs.readFile(__dirname + "/metadata", function(err, data) {
-      var lines = data.toString().split('\n'), i=lines.length;
-      while (/\s+/.test(lines[--i])) {}
-      stream.emit('metadata', "StreamTitle='"+lines[i-1].trim()+"';");
-    });    
-  }
+// clients by appending a line to 'stdin'
+var stdin = process.openStdin();
+stdin.setEncoding('ascii');
+stdin.on('data', function(line) {
+  stream.emit('metadata', "StreamTitle='" + line.trim() + "';");
 });
+
