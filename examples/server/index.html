@@ -12,6 +12,7 @@
           var headers = {};
           if (force) headers['X-Current-Track'] = 1;
           new Ajax.Request("/metadata", {
+            method: 'get',
             onSuccess: function(r) {
               if (r.responseText) {
                 $('events').innerHTML += r.responseText + "\n";
@@ -27,11 +28,15 @@
         poll(true);
 
         // We'll use 'canPlayType' to determine which file format to request
-        var audio = $$("audio")[0];
+        var audio = new Audio();
         if (audio.canPlayType('application/ogg; codecs="vorbis"') == "probably"
             && (/Chrome/i.test(navigator.userAgent) || !/Safari/i.test(navigator.userAgent))) {
           audio.src = "/stream.ogg";
+        } else {
+          audio.src = "stream.mp3";
         }
+        audio.setAttribute('controls', true);
+        document.body.insert({top:audio});
         console.log("loading " + audio.src);
         audio.load();
         audio.play();
@@ -39,7 +44,6 @@
     </script>
   </head>
   <body style="text-align:center;">
-    <audio src="/stream.mp3" controls></audio>
     <br />
     <textarea id="events" style="width:500px;height:300px;">"metadata" events will be printed here...
 </textarea>
