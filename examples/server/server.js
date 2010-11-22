@@ -167,14 +167,14 @@ http.createServer(function(req, res) {
     }
     fifo.on("data", callback);
     clients.push(res);
-    console.error((("New MP3 " + (acceptsMetadata ? "Icecast " : "") + "Client Connected!").bold + " Total " + clients.length).green);
+    console.error((("New MP3 " + (acceptsMetadata ? "Icecast " : "") + "Client Connected: "+req.connection.remoteAddress+"!").bold + " Total " + clients.length).green);
     
     req.connection.on("close", function() {
       // This occurs when the HTTP client closes the connection.
       clients.splice(clients.indexOf(res), 1);
       fifo.removeListener("data", callback);
       mp3.kill();
-      console.error((("MP3 " + (acceptsMetadata ? "Icecast " : "") + "Client Disconnected :(").bold + " Total " + clients.length).red);
+      console.error((("MP3 " + (acceptsMetadata ? "Icecast " : "") + "Client Disconnected: "+req.connection.remoteAddress+" :(").bold + " Total " + clients.length).red);
     });
 
   // If "/stream.ogg" is requested, fire up an OGG encoder (oggenc), and start
@@ -238,14 +238,14 @@ http.createServer(function(req, res) {
     }
     fifo.on("data", callback);
     clients.push(res);
-    console.error((("New OGG " + (acceptsMetadata ? "Icecast " : "") + "Client Connected!").bold + " Total " + clients.length).green);
+    console.error((("New OGG " + (acceptsMetadata ? "Icecast " : "") + "Client Connected: "+req.connection.remoteAddress+"!").bold + " Total " + clients.length).green);
 
     req.connection.on("close", function() {
       // This occurs when the HTTP client closes the connection.
       clients.splice(clients.indexOf(res), 1);
       fifo.removeListener("data", callback);
       ogg.kill();
-      console.error((("OGG " + (acceptsMetadata ? "Icecast " : "") + "Client Disconnected :(").bold + " Total " + clients.length).red);
+      console.error((("OGG " + (acceptsMetadata ? "Icecast " : "") + "Client Disconnected: "+req.connection.remoteAddress+" :(").bold + " Total " + clients.length).red);
     });
 
   // If "/metadata" is requested, then hold of on sending any response, but
