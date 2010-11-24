@@ -42,10 +42,21 @@ stdin.on("data", function(chunk) {
     }, remainder / BYTES_PER_SECOND * 1000);
   }
 
-  while (currentBocSize() > bocSize) {
-    bocData.shift();
-  }
   bocData.push(chunk);
+  var removed = 0;
+  while (currentBocSize() > bocSize) {
+    removed += bocData.shift().length;
+  }
+  
+  // If we've removed a number of bytes that isn't a multiple of BLOCK_ALIGN,
+  // then we'd be left with a partial audio sample, which at best case reverses
+  // the audio channels, and at worst makes the bytes 16-bit ints be offset by 1,
+  // resulting in awful static sound.
+  var stillToRemove = removed % BLOCK_ALIGN;
+  if (stillToRemove > 0) {
+    // We're assuming bocData[0] has AT LEAST BLOCK_ALIGN bytes in it.
+    bocData[0] = bocData[0].slice(stillToRemove);
+  }
 });
 function currentBocSize() {
   var size = 0, i=0, l=bocData.length;
