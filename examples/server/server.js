@@ -3,12 +3,11 @@ var fs = require("fs");
 var http = require("http");
 var spawn = require("child_process").spawn;
 var icecast = require("icecast-stack");
-var InfiniteFifo = require('./InfiniteFifo');
 
-// The infifite 'fifo' that an external script is meant to be writing to.
-var fifo = new InfiniteFifo(__dirname + '/pcmFifo', { bufferSize: 1024 });
+// An external script is meant to be writing PCM data to stdin of the server.
+var stdin = process.openStdin();
 
-// The FIFO is expecting raw PCM data of the format:
+// Stdin is expecting raw PCM data of the format:
 var SAMPLE_SIZE = 16;   // 16-bit samples, Little-Endian, Signed
 var CHANNELS = 2;       // 2 channels (left and right)
 var SAMPLE_RATE = 44100;// 44,100 Hz sample rate.
@@ -18,28 +17,28 @@ var SAMPLE_RATE = 44100;// 44,100 Hz sample rate.
 var BLOCK_ALIGN = SAMPLE_SIZE / 8 * CHANNELS; // Number of 'Bytes per Sample'
 var BYTES_PER_SECOND = SAMPLE_RATE * BLOCK_ALIGN;
 
-// Needed for throttling the FIFO.
+// Needed for throttling stdin.
 var startTime = new Date();
 var totalBytes = 0;
 
 // A simple "Burst-on-Connect" implementation. We'll store the previous "10
 // seconds" worth of raw PCM data, and send it each time a new connection is made.
-// We also do throttling of the FIFO on the 'data' event. Since the raw PCM
+// We also do throttling of stdin on the 'data' event. Since the raw PCM
 // has a liner BYTES_PER_SECOND count, we can calculate an 'expected' value
 // by now, and pause() if we've past that value.
 var bocData = [];
 var bocSize = BYTES_PER_SECOND * 10; // 10 raw PCM seconds in bytes
-fifo.on("data", function(chunk) {
+stdin.on("data", function(chunk) {
   totalBytes += chunk.length;
   var totalSeconds = ((new Date()) - startTime) / 1000;
   var expected = totalSeconds * BYTES_PER_SECOND;
   //console.log(totalBytes, expected);
   if (totalBytes > expected) {
-    fifo.pause();
+    stdin.pause();
     // Use this byte count to calculate how many seconds ahead we are.
     var remainder = totalBytes - expected;
     setTimeout(function() {
-      fifo.resume();
+      stdin.resume();
     }, remainder / BYTES_PER_SECOND * 1000);
   }
 
@@ -56,7 +55,7 @@ function currentBocSize() {
   return size;
 }
 
-// Print out the input KB/s from the FIFO.
+// Print out the input KB/s from stdin.
 /*var BYTES_PER_KILO = 1024;
 setInterval(function() {
   var totalSeconds = ((new Date()) - startTime) / 1000;
@@ -76,7 +75,7 @@ var currentTrack = "unknown";
 var currentTrackStartTime;
 var duration;
 var dId;
-fifo.on("metadata", function(metadata, dur) {
+stdin.on("metadata", function(metadata, dur) {
   currentTrack = metadata;
   console.error(("Received 'metadata' event: ".bold + currentTrack).blue);
   clients.forEach(function(client) {
@@ -165,14 +164,14 @@ http.createServer(function(req, res) {
       if (mp3.stdin.writable)
         mp3.stdin.write(chunk);
     }
-    fifo.on("data", callback);
+    stdin.on("data", callback);
     clients.push(res);
     console.error((("New MP3 " + (acceptsMetadata ? "Icecast " : "") + "Client Connected: "+req.connection.remoteAddress+"!").bold + " Total " + clients.length).green);
     
     req.connection.on("close", function() {
       // This occurs when the HTTP client closes the connection.
       clients.splice(clients.indexOf(res), 1);
-      fifo.removeListener("data", callback);
+      stdin.removeListener("data", callback);
       mp3.kill();
       console.error((("MP3 " + (acceptsMetadata ? "Icecast " : "") + "Client Disconnected: "+req.connection.remoteAddress+" :(").bold + " Total " + clients.length).red);
     });
@@ -236,14 +235,14 @@ http.createServer(function(req, res) {
       if (ogg.stdin.writable)
         ogg.stdin.write(chunk);
     }
-    fifo.on("data", callback);
+    stdin.on("data", callback);
     clients.push(res);
     console.error((("New OGG " + (acceptsMetadata ? "Icecast " : "") + "Client Connected: "+req.connection.remoteAddress+"!").bold + " Total " + clients.length).green);
 
     req.connection.on("close", function() {
       // This occurs when the HTTP client closes the connection.
       clients.splice(clients.indexOf(res), 1);
-      fifo.removeListener("data", callback);
+      stdin.removeListener("data", callback);
       ogg.kill();
       console.error((("OGG " + (acceptsMetadata ? "Icecast " : "") + "Client Disconnected: "+req.connection.remoteAddress+" :(").bold + " Total " + clients.length).red);
     });
@@ -258,7 +257,7 @@ http.createServer(function(req, res) {
       if (ct && auth && auth.substring(0, 6) == "Basic " &&
           Buffer(auth.substring(6),'base64').toString('ascii') == 'node:rules') {
 
-        fifo.emit('metadata', ct.trim(), req.headers['x-duration']);
+        stdin.emit('metadata', ct.trim(), req.headers['x-duration']);
         res.writeHead(200, {
           'Content-Type': 'text/plain',
           'Content-Length': Buffer.byteLength(currentTrack)
@@ -277,7 +276,7 @@ http.createServer(function(req, res) {
       res.end(currentTrack);
     } else {
       req.connection.setTimeout(0); // Disable timeouts
-      fifo.once("metadata", function(metadata) {
+      stdin.once("metadata", function(metadata) {
         res.writeHead(200, {
           'Content-Type': 'text/plain',
           'Content-Length': Buffer.byteLength(metadata)

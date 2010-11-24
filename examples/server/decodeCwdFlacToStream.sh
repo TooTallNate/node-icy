@@ -1,12 +1,9 @@
 #!/usr/bin/env sh
 
 # Place this script in a directory containing FLAC files. When this script is
-# executed, it will forever loop through the files and decode them to the
-# PCMFIFO, where the Node Icecast server will read from.
-
-# The location of the FIFO. It's expecting raw PCM, signed,
-# 16-bit samples, little-endian, 2-channel audio, 44100Hz.
-PCMFIFO=~/node-icecast-stack/examples/server/pcmFifo
+# executed, it will forever loop through the files and decode them to stdout,
+# where the Node Icecast server will read from.
+#   Usage: ./decodeCwdFlacToStream.sh | node server.js
 
 # The hostname and port of our Node Icecast server.
 ICECAST=localhost:5555
@@ -15,7 +12,7 @@ while (true);
   do
 
   # First store the list of FLAC files into a temp file.
-  TEMP=`mktemp list.XXXXXXXX`;
+  TEMP=`mktemp -t list.XXXXXXXX`;
   find "$PWD" -name "*.flac" > "$TEMP";
 
   # Loop through each entry of the temp file, invoking a 'metadata' event, and decoding the FLAC file.
@@ -28,13 +25,12 @@ while (true);
     ALBUM=`metaflac --show-tag=ALBUM "$f" | sed "s/ALBUM=//"`;
 
     # Set a 'metadata' event to update the current track
-    curl -X POST -u "node:rules" -H "X-Current-Track: $TITLE - $ARTIST - $ALBUM" "$ICECAST/metadata";
+    curl --silent -X POST -u "node:rules" -H "X-Current-Track: $TITLE - $ARTIST - $ALBUM" "$ICECAST/metadata" > /dev/null;
 
     # TODO: Use 'flac' to decode, instead of 'ffmpeg'
-    ffmpeg -f flac -i "$f" -f wav -acodec pcm_s16le - >> "$PCMFIFO";
+    ffmpeg -f flac -i "$f" -f wav -acodec pcm_s16le -;
 
   done 3<"$TEMP";
 
-  echo "Deleting temp file:";
-  rm -vf "$TEMP";
+  rm -f "$TEMP";
 done;

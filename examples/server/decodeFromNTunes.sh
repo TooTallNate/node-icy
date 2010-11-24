@@ -1,11 +1,8 @@
 #!/usr/bin/env sh
 
 # This example script uses "nTunes" to iterate through the track list CRITERIA,
-# and using the result as the playlist for the 
-
-# The location of the FIFO. It's expecting raw PCM, signed,
-# 16-bit samples, little-endian, 2-channel audio, 44100Hz.
-PCMFIFO=~/node-icecast-stack/examples/server/pcmFifo
+# and using the result as the playlist for the Icecast server.
+#   Usage:  ./decodeFromNTunes.sh | node server.js
 
 # The hostname and port of our Node Icecast server.
 ICECAST=localhost:5555
@@ -38,10 +35,10 @@ while (true);
     DURATION=`$CURL/$i/duration?format=txt`
 
     # Set a 'metadata' event to update the current track
-    curl -X POST -u "node:rules" -H "X-Current-Track: $NAME - $ARTIST - $ALBUM" -H "X-Duration: $DURATION" "$ICECAST/metadata";
+    curl --silent -X POST -u "node:rules" -H "X-Current-Track: $NAME - $ARTIST - $ALBUM" -H "X-Duration: $DURATION" "$ICECAST/metadata" > /dev/null;
 
     # Use 'lame' to decode the MP3 to raw PCM, 44100
-    lame --mp3input "$LOCATION" --decode -t -s 44.1 --signed --little-endian - >> "$PCMFIFO";
+    lame --mp3input "$LOCATION" --decode -t -s 44.1 --signed --little-endian -;
 
     i=$[ $i + 1 ];
 
