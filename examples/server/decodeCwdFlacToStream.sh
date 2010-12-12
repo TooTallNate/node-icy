@@ -20,15 +20,15 @@ while (true);
     do
 
     # First extract the TITLE, ARITST, and ALBUM from the FLAC file, for the 'metadata' event.
-    TITLE=`metaflac --show-tag=TITLE "$f" | sed "s/TITLE=//"`;
-    ARTIST=`metaflac --show-tag=ARTIST "$f" | sed "s/ARTIST=//"`;
-    ALBUM=`metaflac --show-tag=ALBUM "$f" | sed "s/ALBUM=//"`;
+    #TITLE=`metaflac --show-tag=TITLE "$f" | sed "s/TITLE=//"`;
+    #ARTIST=`metaflac --show-tag=ARTIST "$f" | sed "s/ARTIST=//"`;
+    #ALBUM=`metaflac --show-tag=ALBUM "$f" | sed "s/ALBUM=//"`;
 
     # Set a 'metadata' event to update the current track
-    curl --silent -X POST -u "node:rules" -H "X-Current-Track: $TITLE - $ARTIST - $ALBUM" "$ICECAST/metadata" > /dev/null;
+    #curl --silent -X POST -u "node:rules" -H "X-Current-Track: $TITLE - $ARTIST - $ALBUM" "$ICECAST/metadata" > /dev/null;
 
     # TODO: Use 'flac' to decode, instead of 'ffmpeg'
-    ffmpeg -f flac -i "$f" -f wav -acodec pcm_s16le -;
+    ffmpeg -f flac -i "$f" -f s16le -acodec pcm_s16le -ac 2 -ar 44100 -;
 
   done 3<"$TEMP";
 

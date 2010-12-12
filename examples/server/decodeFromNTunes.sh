@@ -20,12 +20,24 @@ while (true);
   do
 
   # First, get the total count of the selected criteria.
-  N=`$CURL/count`;
+  N=$[$[`$CURL/count`] + 1];
+  
+  # Check if 'currentSong' exists. If it does, then load the number from that
+  # as a lazy 'saved-state' on server reboots. Otherwise, just set 'i' to 1.
+  if [ -e "$PWD/currentSong" ]
+  then
+    i=`cat "$PWD/currentSong"`;
+    echo "Loaded '$i' from 'currentSong'" >&2;
+  else
+    echo "'currentSong' does not exist, setting index to 1..." >&2;
+    i="1";
+  fi;
 
-  # Loop through each entry of the temp file, invoking a 'metadata' event, and decoding the FLAC file.
-  i="1";
   while [ $i -lt $N ]
     do
+    
+    # Save the current state, in case we need to reboot the server.
+    echo $i > "$PWD/currentSong";
     
     # Get the location, name, artist and album of the track.
     LOCATION=`$CURL/$i/location?format=txt`
@@ -37,10 +49,14 @@ while (true);
     # Set a 'metadata' event to update the current track
     curl --silent -X POST -u "node:rules" -H "X-Current-Track: $NAME - $ARTIST - $ALBUM" -H "X-Duration: $DURATION" "$ICECAST/metadata" > /dev/null;
 
-    # Use 'lame' to decode the MP3 to raw PCM, 44100
-    lame --mp3input "$LOCATION" --decode -t -s 44.1 --signed --little-endian -;
-
+    # Use 'ffmpeg' to decode the input file to raw 16-bit PCM, 44100
+    ffmpeg -i "$LOCATION" -f s16le -acodec pcm_s16le -ar 44100 -ac 2 - 2>/dev/null;
+    
     i=$[ $i + 1 ];
+    if [ $i -eq $N ]
+    then
+      rm "$PWD/currentSong"
+    fi
 
   done;
 done;
