@@ -5,7 +5,7 @@
   "author": "Nathan Rajlich <nathan@tootallnate.net>",
   "keywords": ["SHOUTcast", "Icecast", "Radio", "Internet", "Metadata", "ReadStream", "StreamStack"],
   "dependencies": {
-    "stream-stack": "*",
+    "stream-stack": ">= 1.0.0",
     "http-stack": "*"
   },
   "devDependencies" : {
