@@ -5,8 +5,8 @@
   "author": "Nathan Rajlich <nathan@tootallnate.net>",
   "keywords": ["SHOUTcast", "Icecast", "Radio", "Internet", "Metadata", "ReadStream", "StreamStack"],
   "dependencies": {
-    "stream-stack": ">= 1.0.0",
-    "http-stack": "*"
+    "stream-stack": ">= 1.1.0",
+    "http-stack": ">= 0.1.1"
   },
   "devDependencies" : {
     "colors": ">= 0.3.0"
@@ -15,5 +15,6 @@
   "modules": {
     "client": "./lib/client"
   },
+  "scripts": { "test": "expresso test/test*.js" },
   "engines": { "node": ">= 0.3.0" }
 }
