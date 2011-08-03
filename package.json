@@ -9,7 +9,8 @@
     "http-stack": ">= 0.1.1"
   },
   "devDependencies" : {
-    "colors": ">= 0.3.0"
+    "colors": ">= 0.3.0",
+    "expresso": "0.8.x"
   },
   "main": "./lib/icecast-stack",
   "modules": {
