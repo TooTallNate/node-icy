@@ -1,7 +1,7 @@
 var fs = require('fs');
 var http = require('http-stack');
 var assert = require('assert');
-var icecast = require('icecast-stack');
+var icecast = require('../');
 
 exports['test 4EverFloyd-1.dump'] = function() {
   var stream = fs.createReadStream(__dirname + "/dumps/4EverFloyd-1.dump");
