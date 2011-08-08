@@ -18,30 +18,32 @@ Usage
 Here's a basic example of just piping the clean audio data to _stdout_,
 while printing the HTTP response headers and metadata events to _stderr_:
 
-    var icecast = require('icecast-stack');
+``` javascript
+var icecast = require('icecast-stack');
 
-    var url = 'http://67.205.85.183:7714'; // URL to a known Icecast stream
-    var stream = icecast.createReadStream(url);
+var url = 'http://67.205.85.183:7714'; // URL to a known Icecast stream
+var stream = icecast.createReadStream(url);
 
-    // Fired when the `net.Stream` has it's 'connect' event.
-    stream.on('connect', function() {
-      console.error("Radio Stream connected!");
-    });
+// Fired when the `net.Stream` has it's 'connect' event.
+stream.on('connect', function() {
+  console.error("Radio Stream connected!");
+});
     
-    // Fired after the HTTP response headers have been received.
-    stream.on('response', function(res) {
-      console.error("Radio Stream response!");
-      console.error(res.headers);
-    });
+// Fired after the HTTP response headers have been received.
+stream.on('response', function(res) {
+  console.error("Radio Stream response!");
+  console.error(res.headers);
+});
 
-    // When a 'metadata' event happens, usually a new song is starting.
-    stream.on('metadata', function(metadata) {
-      var title = icecast.parseMetadata(metadata).StreamTitle;
-      console.error(title);
-    });
+// When a 'metadata' event happens, usually a new song is starting.
+stream.on('metadata', function(metadata) {
+  var title = icecast.parseMetadata(metadata).StreamTitle;
+  console.error(title);
+});
 
-    // Proxy the raw audio stream to 'stdout', redirect to a file!
-    stream.pipe(process.stdout);
+// Proxy the raw audio stream to 'stdout', redirect to a file!
+stream.pipe(process.stdout);
+```
 
 Look in the `examples` directory for code of some more complex use-cases.
 
@@ -58,14 +60,18 @@ Installation
 Installation through [__npm__](http://github.com/isaacs/npm) is the most
 straight-forward way to install the `node-icecast-stack` module:
 
-    npm install icecast-stack
+``` shell
+npm install icecast-stack
+```
 
 Or just checking out this _git_ repo works as well:
 
-    git clone git://github.com/TooTallNate/node-icecast-stack.git
+``` shell
+git clone git://github.com/TooTallNate/node-icecast-stack.git
+```
 
 
 [NodeJS]: http://nodejs.org
 [StreamStack]: http://github.com/TooTallNate/node-stream-stack
-[SHOUTcast]: http://www.shoutcast.com/
-[Icecast]: http://icecast.org/
+[SHOUTcast]: http://www.shoutcast.com
+[Icecast]: http://icecast.org
