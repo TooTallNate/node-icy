@@ -8,19 +8,20 @@
  *     node examples/basic/basic.js | mpg123 -
  */
 require('colors');
-var icecast = require('../../');
-var stations = require('../radioStations');
+var icecast = require('../..')
+  , stations = require('../radioStations')
 
 
 // Create a high-level Icecast Client instance.
-var stream = require('../../client').createClient(process.argv[2] || stations.random().url);
+var url = process.argv[2] || stations.random().url
+  , stream = require('../../client').createClient(url)
+console.error(('Sending HTTP Request for: '.bold + url).cyan);
 
 
 // 'connect' is fired when the TCP stream connection is established.
 stream.on('connect', function() {
   var topStream = stream.topStream;
   console.error(('Connected to: '.bold + topStream.remoteAddress + ':' + topStream.remotePort).magenta);
-  console.error(('Sending HTTP Request for: '.bold + stream.url).cyan);
 });
 
 
@@ -47,7 +48,7 @@ stream.on('metadata', function(title) {
 
 
 // As long as the 'stdout' is being redirected to something, pipe the audio to stdout.
-if (!process.binding('stdio').isatty(process.stdout.fd)) {
+if (!require('tty').isatty(process.stdout.fd)) {
   stream.pipe(process.stdout);
 } else {
   console.error("Use your shell to redirect the audio data from 'stdout' someplace useful:".red.bold);
