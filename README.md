@@ -21,7 +21,7 @@ while printing the HTTP response headers and metadata events to _stderr_:
 ``` javascript
 var icecast = require('icecast-stack');
 
-var url = 'http://67.205.85.183:7714'; // URL to a known Icecast stream
+var url = 'http://67.205.85.183:5500'; // URL to a known Icecast stream
 var stream = icecast.createReadStream(url);
 
 // Fired when the `net.Stream` has it's 'connect' event.
