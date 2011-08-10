@@ -1,5 +1,5 @@
 exports.stations = {
-  "4 Ever Floyd": "http://67.205.85.183:7714",
+  "4 Ever Floyd": "http://67.205.85.183:5500",
   "Feeling Floyd": "http://Streaming23.radionomy.com/FeelingFloyd",
   "KFRC": "http://2133.live.streamtheworld.com:80/KFRCFMCMP3",
   ".977 The Comedy Channel": "http://icecast3.977music.com/comedy"
