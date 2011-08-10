@@ -1,12 +1,12 @@
-var net = require('net');
-var parse = require('url').parse;
-var HttpRequestStack = require('http-stack').HttpRequestStack;
-var IcecastReadStack = require('./icecast-stack').IcecastReadStack;
+var net = require('net')
+  , parse = require('url').parse
+  , HttpRequestStack = require('http-stack').HttpRequestStack
+  , IcecastReadStack = require('./icecast-stack').IcecastReadStack
 
 /**
  * A full-blown Icecast/SHOUTcast compliant Client class. Conveniently takes
  * care of creating a low-level TCP connection, sending an HTTP request, and
- * parsing the 'metadata' events out of the resulting audio stream.
+ * filtering the 'metadata' events out of the resulting audio stream.
  */
 function Client(url, headers, retainMetadata) {
 
@@ -14,14 +14,14 @@ function Client(url, headers, retainMetadata) {
   var parsedUrl = parse(url);
   // ensure an HTTP based path and port
   parsedUrl.pathname = parsedUrl.pathname || '/';
-  parsedUrl.port = parsedUrl.port || (parsedUrl.protocol == "https:" ? 443 : 80);
+  parsedUrl.port || (parsedUrl.port = parsedUrl.protocol == "https:" ? 443 : 80);
 
   // Create the low-level TCP connection to the remote server.
   var stream = net.createConnection(parsedUrl.port, parsedUrl.hostname);
   stream.allowHalfOpen = true;
   stream.remoteAddress = parsedUrl.hostname;
   stream.remotePort = parsedUrl.port;
-  
+
   // Stack an 'HttpRequstStack' instance on it, and send an HTTP request
   // to the specified URL.
   stream = new HttpRequestStack(stream);
@@ -29,13 +29,13 @@ function Client(url, headers, retainMetadata) {
   headers.push('Icy-MetaData: 1');
   stream.get(parsedUrl.pathname, headers);
   stream.end();
-  
+
   // Next stack "this" 'IcecastReadStack' instance on top of that, setting the
   // inital 'metaint' value to Infinity. Setting to Infinity is just a hack
   // that allows us to have the 'createClient' function return immediately,
   // instead of invoking a callback with the stream instance.
   IcecastReadStack.call(this, stream, Infinity, retainMetadata);
-  
+
   // Keep a reference to the URL used to connect to the Icecast server.
   this.url = url;
 
@@ -65,4 +65,3 @@ function createClient(url, headers, retainMetadata) {
   return new Client(url, headers, retainMetadata);
 }
 exports.createClient = createClient;
-
