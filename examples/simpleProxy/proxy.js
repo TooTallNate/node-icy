@@ -20,7 +20,7 @@ require("colors");
 var fs = require("fs");
 var http = require("http");
 var spawn = require("child_process").spawn;
-var icecast = require("icecast-stack");
+var icecast = require("../..");
 var stations = require("../radioStations");
 
 // If you pass a URL to a SHOUTcast/Icecast stream, then we'll use that,
@@ -38,7 +38,7 @@ console.error(('  '+station.name.bold+': '+station.url).green);
 
 // Connect to the remote radio stream, and pass the raw audio data to any
 // client requesting the "/stream" URL (will be an <audio> tag).
-var stream = require('icecast-stack/client').createClient(station.url);
+var stream = require('../../client').createClient(station.url);
 
 // If the remote connection to the radio stream closes, then just shutdown the
 // server and print an error. Do something more elegant in a real world scenario.

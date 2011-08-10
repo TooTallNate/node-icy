@@ -10,10 +10,10 @@
  *     node examples/splitFileOnMetadata/splitFileOnMetadata.js
  */
 var fs = require("fs");
-var icecast = require("../../lib/icecast-stack");
+var icecast = require("../..");
 var stations = require("../radioStations");
 
-var stream = icecast.createReadStream(stations.random().url);
+var stream = icecast.createReadStream(process.argv[2] || stations.random().url);
 
 var currentFile;
 stream.on("data", function(chunk) {

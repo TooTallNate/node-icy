@@ -2,7 +2,7 @@ require("colors");
 var fs = require("fs");
 var http = require("http");
 var spawn = require("child_process").spawn;
-var icecast = require("icecast-stack");
+var icecast = require("../..");
 
 // An external script is meant to be writing PCM data to stdin of the server.
 var stdin = process.openStdin();

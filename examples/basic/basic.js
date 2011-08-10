@@ -8,12 +8,12 @@
  *     node examples/basic/basic.js | mpg123 -
  */
 require('colors');
-var icecast = require('icecast-stack');
+var icecast = require('../../');
 var stations = require('../radioStations');
 
 
 // Create a high-level Icecast Client instance.
-var stream = require('icecast-stack/client').createClient(stations.random().url);
+var stream = require('../../client').createClient(process.argv[2] || stations.random().url);
 
 
 // 'connect' is fired when the TCP stream connection is established.
@@ -28,7 +28,7 @@ stream.on('connect', function() {
 stream.on('response', function() {
   console.error('HTTP Response Headers Received:'.green.bold);
   stream.headers.forEach(function(header) {
-    console.error('  ' + header.name.blue.bold + ':'.green, header.value.blue);
+    console.error('  ' + header.key.blue.bold + ':'.green, header.value.blue);
   });
 });
 
@@ -40,7 +40,7 @@ stream.on('metadata', function(title) {
   // Parse the 'title' String into an Object.
   var parsed = icecast.parseMetadata(title);
   for (var i in parsed) {
-    metadata += (i+': ').yellow.bold + (parsed[i]+'; ').white;
+    metadata += (i+': ').yellow.bold + (parsed[i]+' ').white;
   }
   console.error(metadata);
 });
