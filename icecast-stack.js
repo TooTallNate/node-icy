@@ -250,8 +250,6 @@ IcecastWriteStack.prototype._injectNextMetadata = function() {
  * is stripped, parsed, and formatted into the 'metadata' event).
  */
 function createReadStream(url, headers, retainMetadata) {
-  console.error("`require('icecast-stack').createReadStream()` has been "+
-    "deprecated in favor of `require('icecast-stack/client').createClient()`.");
   return require('./client').createClient(url, headers, retainMetadata);
 }
 exports.createReadStream = createReadStream;
