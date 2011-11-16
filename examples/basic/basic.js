@@ -48,7 +48,7 @@ stream.on('metadata', function(title) {
 
 
 // As long as the 'stdout' is being redirected to something, pipe the audio to stdout.
-if (!require('tty').isatty(process.stdout.fd)) {
+if (!process.stdout.isTTY) {
   stream.pipe(process.stdout);
 } else {
   console.error("Use your shell to redirect the audio data from 'stdout' someplace useful:".red.bold);
