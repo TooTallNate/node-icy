@@ -7,7 +7,7 @@ parsing the metadata from a [SHOUTcast][] or [Icecast][] broadcast. Two API's
 are offered: a low-level [StreamStack][] read and write interface (which
 requires you to establish the connection to the `net.Stream` yourself), and a
 more convenient high-level
-[ReadStream](http://nodejs.org/docs/v0.4.10/api/streams.html) interface (which
+[ReadStream](http://nodejs.org/docs/latest/api/streams.html) interface (which
 creates a `net.Stream` connection, and uses the `StreamStack` interfaces
 transparently).
 
