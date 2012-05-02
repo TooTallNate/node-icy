@@ -89,7 +89,7 @@ IcecastReadStack.prototype.onMetaData = function(chunk) {
     } else {
       this.metaBuffer = metaChunk;
     }
-    this.emit("metadata", this.metaBuffer.toString());
+    this.emit("metadata", this.metaBuffer.toString(), this.metaBuffer);
     //console.error("Meta Bytes Recieved: " + this.counter + ", " + this.metaBuffer.length);
     this.metaBuffer = null;
     this.metaLength = null;
