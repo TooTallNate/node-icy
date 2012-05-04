@@ -1,7 +1,7 @@
 {
   "name": "icecast-stack",
   "description": "A `StreamStack` implementation for parsing and/or injecting metadata with SHOUTcast/Icecast radio streams.",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "author": "Nathan Rajlich <nathan@tootallnate.net>",
   "repository": { "type": "git", "url": "git://github.com/TooTallNate/node-icecast-stack.git" },
   "keywords": [
