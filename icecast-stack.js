@@ -89,7 +89,7 @@ IcecastReadStack.prototype.onMetaData = function(chunk) {
     } else {
       this.metaBuffer = metaChunk;
     }
-    this.emit("metadata", this.metaBuffer.toString());
+    this.emit("metadata", this.metaBuffer);
     //console.error("Meta Bytes Recieved: " + this.counter + ", " + this.metaBuffer.length);
     this.metaBuffer = null;
     this.metaLength = null;
@@ -263,11 +263,11 @@ exports.createReadStream = createReadStream;
 // Used to strip 'null' bytes from the metadata event
 var nullExp = new RegExp('\0', 'g');
 /**
- * Accepts the String passed from the 'metadata' event, and parses it into
+ * Accepts the Buffer passed from the 'metadata' event, and parses it into
  * a JavaScript object.
  */
 function parseMetadata(metadata) {
-  var rtn = {}, pieces = metadata.replace(nullExp, '').split(";");
+  var rtn = {}, pieces = metadata.toString().replace(nullExp, '').split(";");
   for (var i=0, l=pieces.length; i<l; i++) {
     var piece = pieces[i];
     if (piece.length) {
