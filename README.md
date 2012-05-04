@@ -60,14 +60,14 @@ Installation
 Installation through [__npm__](http://github.com/isaacs/npm) is the most
 straight-forward way to install the `node-icecast-stack` module:
 
-``` shell
-npm install icecast-stack
+``` bash
+$ npm install icecast-stack
 ```
 
 Or just checking out this _git_ repo works as well:
 
-``` shell
-git clone git://github.com/TooTallNate/node-icecast-stack.git
+``` bash
+$ git clone git://github.com/TooTallNate/node-icecast-stack.git
 ```
 
 
