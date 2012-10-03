@@ -1,31 +1,28 @@
 {
-  "name": "icecast-stack",
-  "description": "A `StreamStack` implementation for parsing and/or injecting metadata with SHOUTcast/Icecast radio streams.",
+  "name": "icecast",
+  "description": "Node.js streams for parsing and/or injecting metadata with SHOUTcast/Icecast radio streams",
   "version": "0.3.0",
   "author": "Nathan Rajlich <nathan@tootallnate.net>",
   "repository": { "type": "git", "url": "git://github.com/TooTallNate/node-icecast-stack.git" },
   "keywords": [
-    "SHOUTcast",
-    "Icecast",
-    "Radio",
-    "Internet",
-    "Metadata",
-    "ReadStream",
-    "StreamStack"
+    "shoutcast",
+    "icecast",
+    "radio",
+    "internet",
+    "metadata",
+    "stream"
   ],
   "dependencies": {
-    "stream-stack": ">= 1.1.0",
-    "http-stack": ">= 0.1.1"
+    "debug": "*"
   },
   "devDependencies": {
-    "colors": ">= 0.3.0",
-    "expresso": "0.8.x"
+    "mocha": "*"
   },
-  "main": "./icecast-stack.js",
+  "main": "./index.js",
   "scripts": {
-    "test": "expresso test/test*.js"
+    "test": "mocha"
   },
   "engines": {
-    "node": ">= 0.3.0"
+    "node": "*"
   }
 }
