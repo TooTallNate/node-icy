@@ -23,7 +23,7 @@ exports.request = function (options, fn) {
   return new exports.Client(options, fn);
 };
 exports.get = function (options, fn) {
-  var req = exports.request(options, cb);
+  var req = exports.request(options, fn);
   req.end();
   return req;
 };
