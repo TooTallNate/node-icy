@@ -7,7 +7,8 @@ if (process.stdout.isTTY) {
   process.exit(1);
 }
 
-var req = new icecast.Client(url, function (res) {
+icecast.get(url, function (res) {
+  console.error(res);
   console.error(res.headers);
   res.on('metadata', onMetadata);
   res.pipe(process.stdout);
@@ -18,5 +19,3 @@ function onMetadata (metadata) {
   console.error('METADATA EVENT:');
   console.error(metadata);
 }
-
-req.end();
