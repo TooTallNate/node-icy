@@ -1,5 +1,5 @@
 exports.stations = {
-  '4 Ever Floyd': 'http://67.205.85.183:5500',
+  '4 Ever Floyd': 'http://99.198.112.59:8000',
   '4 Ever Zeppelin': 'http://173.236.59.82:8330',
   'Feeling Floyd': 'http://streaming201.radionomy.com:80/FeelingFloyd?group=999',
   'KFRC': 'http://2133.live.streamtheworld.com:80/KFRCFMCMP3',
