@@ -1,17 +1,22 @@
 
-var fs = require('fs');
+var url = process.argv[2] || 'http://radio.nugs.net:8002';
 var icecast = require('./');
-var file = process.argv[2] || __dirname + '/test/dumps/4EverFloyd-1-8192.mp3';
 
-var r = new icecast.Reader(8192);
+if (process.stdout.isTTY) {
+  console.error('fatal: you must pipe this script to mpg123');
+  process.exit(1);
+}
 
-// offset of 313 to skip the ICY-headers
-fs.createReadStream(file, { start: 313 }).pipe(r);
+var req = new icecast.Client(url, function (res) {
+  console.error(res.headers);
+  res.on('metadata', onMetadata);
+  res.pipe(process.stdout);
+});
 
-r.on('metadata', function (metadata) {
+function onMetadata (metadata) {
   metadata = icecast.parse(metadata);
   console.error('METADATA EVENT:');
   console.error(metadata);
-});
+}
 
-r.pipe(process.stdout);
+req.end();
