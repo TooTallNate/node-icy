@@ -4,7 +4,8 @@ exports.stations = {
   'Feeling Floyd': 'http://streaming201.radionomy.com:80/FeelingFloyd?group=999',
   'KFRC': 'http://2133.live.streamtheworld.com:80/KFRCFMCMP3',
   '.977 The Comedy Channel': 'http://icecast3.977music.com/comedy',
-  'LivePhish': 'http://radio.nugs.net:8002'
+  'LivePhish': 'http://radio.nugs.net:8002',
+  'GDRadio': 'http://sc1-fmt.spacialnet.com:26260'
 };
 
 exports.random = function() {
