@@ -8,7 +8,6 @@ if (process.stdout.isTTY) {
 }
 
 icecast.get(url, function (res) {
-  console.error(res);
   console.error(res.headers);
   res.on('metadata', onMetadata);
   res.pipe(process.stdout);
