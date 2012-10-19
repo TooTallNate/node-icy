@@ -13,7 +13,8 @@
     "stream"
   ],
   "dependencies": {
-    "debug": "*"
+    "debug": "*",
+    "readable-stream": "*"
   },
   "devDependencies": {
     "mocha": "*"
