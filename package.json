@@ -21,7 +21,7 @@
   },
   "main": "./index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --reporter spec"
   },
   "engines": {
     "node": "*"
