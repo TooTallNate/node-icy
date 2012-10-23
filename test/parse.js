@@ -22,4 +22,13 @@ describe('metadata parser', function () {
     assert.deepEqual([ 'StreamTitle', 'StreamUrl' ], Object.keys(output));
   });
 
+  it('should parse the metadata into an Object 3', function () {
+    var input = 'StreamTitle=\'Grateful Dead - 1992-05-24  So Many Roads\';StreamUrl=\'http://www.dead.net?&artist=Grateful%20Dead&title=1992%2D05%2D24%20%20So%20Many%20Roads&album=1992%2D05%2D24%20%2D%20Shoreline%20Amphitheatre&duration=423288&songtype=S&overlay=no&buycd=http\';\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000';
+    var output = icecast.parse(input);
+    assert.equal('object', typeof output);
+    assert.equal('Grateful Dead - 1992-05-24  So Many Roads', output.StreamTitle);
+    assert.equal('http://www.dead.net?&artist=Grateful%20Dead&title=1992%2D05%2D24%20%20So%20Many%20Roads&album=1992%2D05%2D24%20%2D%20Shoreline%20Amphitheatre&duration=423288&songtype=S&overlay=no&buycd=http', output.StreamUrl);
+    assert.deepEqual([ 'StreamTitle', 'StreamUrl' ], Object.keys(output));
+  });
+
 });
