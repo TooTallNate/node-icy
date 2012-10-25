@@ -2,7 +2,7 @@ node-icecast
 ============
 ### NodeJS module for parsing and/or injecting metadata into SHOUTcast/Icecast radio streams
 
-This module offers a `Reader` classe for retrieving the raw audio data and
+This module offers a `Reader` class for retrieving the raw audio data and
 parsing the metadata from a [SHOUTcast][] or [Icecast][] broadcast.
 
 There's also a `Writer` class that allows you to inject your own metadata into a
