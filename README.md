@@ -52,8 +52,8 @@ icecast.get(url, function (res) {
 
   // log any "metadata" events that happen
   res.on('metadata', function (metadata) {
-    var title = icecast.parseMetadata(metadata).StreamTitle;
-    console.error(title);
+    var parsed = icecast.parse(metadata);
+    console.error(parsed);
   });
 
   // pipe the audio data to `stdout`
