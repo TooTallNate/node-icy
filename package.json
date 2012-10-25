@@ -1,7 +1,7 @@
 {
   "name": "icecast",
-  "description": "Node.js streams for parsing and/or injecting metadata with SHOUTcast/Icecast radio streams",
-  "version": "0.3.0",
+  "description": "NodeJS module for parsing and/or injecting metadata with SHOUTcast/Icecast radio streams",
+  "version": "1.0.0",
   "author": "Nathan Rajlich <nathan@tootallnate.net>",
   "repository": { "type": "git", "url": "git://github.com/TooTallNate/node-icecast.git" },
   "keywords": [
