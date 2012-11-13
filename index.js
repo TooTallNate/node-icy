@@ -14,8 +14,8 @@ exports.Reader = require('./lib/reader');
 exports.Writer = require('./lib/writer');
 
 /**
- * Icecast HTTP client interface. Aims to map directly 1-1 the "http" module's
- * client interface.
+ * Icecast HTTP client interface. Extends the core "http" module's client
+ * interface with "ICY" support, and the `res` emits "metadata" events.
  */
 
 exports.Client = require('./lib/client');
