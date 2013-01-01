@@ -31,4 +31,15 @@ describe('metadata parser', function () {
     assert.deepEqual([ 'StreamTitle', 'StreamUrl' ], Object.keys(output));
   });
 
+  it('should parse the metadata with utf8 symbols into an Object', function () {
+    var input = new Buffer([ 83, 116, 114, 101, 97, 109, 84, 105, 116, 108, 101, 61, 39, 0xE2, 0x82, 0xAC, 39, 59, 83, 116, 114, 101, 97, 109, 85, 114, 108, 61, 39, 0xC2, 0xA2, 39, 59, 0, 0 ]);
+    var euro = new Buffer([ 0xE2, 0x82, 0xAC ]);
+    var cent = new Buffer([ 0xC2, 0xA2 ]);
+    var output = icecast.parse(input);
+    assert.equal('object', typeof output);
+    assert.equal(euro.toString('utf8'), output.StreamTitle);
+    assert.equal(cent.toString('utf8'), output.StreamUrl);
+    assert.deepEqual([ 'StreamTitle', 'StreamUrl' ], Object.keys(output));
+  });
+
 });
