@@ -1,4 +1,4 @@
-
+﻿
 var icecast = require('../');
 var assert = require('assert');
 
@@ -22,6 +22,19 @@ describe('metadata parser', function () {
     assert.deepEqual([ 'StreamTitle', 'StreamUrl' ], Object.keys(output));
   });
 
+  it('should parse the utf8 metadata into an Object', function () {
+    var input = new Buffer([ 83, 116, 114, 101, 97, 109, 84, 105, 116, 108, 101, 61, 39, 0xE2, 0x82, 0xAC, 39, 59, 83, 116, 114, 101, 97, 109, 85, 114, 108, 61, 39, 0xC2, 0xA2, 39, 59, 0, 0 ]);
+	var euro = new Buffer([0xE2, 0x82, 0xAC]);
+	var cent = new Buffer([0xC2, 0xA2]);
+    var output = icecast.parse(input);
+	assert.equal('object', typeof output);
+	var StringDecoder = require('string_decoder').StringDecoder;
+	var decoder = new StringDecoder('utf8');
+	assert.equal(decoder.write(euro), output.StreamTitle);
+    assert.equal(decoder.write(cent), output.StreamUrl);
+    assert.deepEqual([ 'StreamTitle', 'StreamUrl' ], Object.keys(output));
+  });
+  
   it('should parse the metadata into an Object 3', function () {
     var input = 'StreamTitle=\'Grateful Dead - 1992-05-24  So Many Roads\';StreamUrl=\'http://www.dead.net?&artist=Grateful%20Dead&title=1992%2D05%2D24%20%20So%20Many%20Roads&album=1992%2D05%2D24%20%2D%20Shoreline%20Amphitheatre&duration=423288&songtype=S&overlay=no&buycd=http\';\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000';
     var output = icecast.parse(input);
