@@ -14,6 +14,7 @@
   ],
   "dependencies": {
     "debug": "*",
+    "stream-parser": "*",
     "readable-stream": "*"
   },
   "devDependencies": {
