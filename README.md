@@ -93,12 +93,14 @@ Also see the [`request()`](#request) and [`get()`](#get) convenience functions.
 
 ## request()
 
-`request()` convenience function. Similar to node core's `http.request()`,
+`request()` convenience function. Similar to node core's
+[`http.request()`](http://nodejs.org/docs/latest/api/http.html#http_http_request_options_callback),
 except it returns an `icecast.Client` instance.
 
 ## get()
 
-`get()` convenience function. Similar to node core's `http.get()`,
+`get()` convenience function. Similar to node core's
+[`http.get()`](http://nodejs.org/docs/latest/api/http.html#http_http_get_options_callback),
 except it returns an `icecast.Client` instance with `.end()` called on it and
 no request body written to it (the most common scenario).
 
