@@ -128,8 +128,7 @@ Parses a Buffer (or String) containing Icecast metadata into an Object.
 
 ## stringify()
 
-The `stringify` function takes an Object and converts it into an Icecast
-metadata string.
+Takes an Object and converts it into an Icecast metadata string.
 
 [NodeJS]: http://nodejs.org
 [Icecast]: http://icecast.org
