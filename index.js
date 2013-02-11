@@ -19,11 +19,5 @@ exports.Writer = require('./lib/writer');
  */
 
 exports.Client = require('./lib/client');
-exports.request = function (options, fn) {
-  return new exports.Client(options, fn);
-};
-exports.get = function (options, fn) {
-  var req = exports.request(options, fn);
-  req.end();
-  return req;
-};
+exports.request = require('./lib/request');
+exports.get = require('./lib/get');
