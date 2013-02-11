@@ -66,20 +66,70 @@ icecast.get(url, function (res) {
 API
 ---
 
-### `Client` class
+  - [Client()](#client)
+  - [request()](#request)
+  - [get()](#get)
+  - [Reader()](#reader)
+  - [Writer()](#writer)
+    - [.queue()](#writerqueuemetadata)
+  - [parse()](#parse)
+  - [stringify()](#stringify)
 
-### `Reader` class
+## Client()
 
-### `Writer` class
+The `Client` class is a subclass of the `http.ClientRequest` object.
 
-### `request()` function
+It adds a stream preprocessor to make "ICY" responses work. This is only needed
+because of the strictness of node's HTTP parser. I'll volley for ICY to be
+supported (or at least configurable) in the http header for the JavaScript
+HTTP rewrite (v0.12 of node?).
 
-### `get()` function
+The other big difference is that it passes an `icecast.Reader` instance
+instead of a `http.ClientResponse` instance to the "response" event callback,
+so that the "metadata" events are automatically parsed and the raw audio stream
+it output without the Icecast bytes.
 
-### `parse()` function
+Also see the [`request()`](#request) and [`get()`](#get) convenience functions.
 
-### `stringify()` function
+## request()
 
+`request()` convenience function. Similar to node core's `http.request()`,
+except it returns an `icecast.Client` instance.
+
+## get()
+
+`get()` convenience function. Similar to node core's `http.get()`,
+except it returns an `icecast.Client` instance with `.end()` called on it and
+no request body written to it (the most common scenario).
+
+## Reader()
+
+Icecast stream reader. This is a duplex stream that emits "metadata" events in
+addition to stripping out the metadata itself from the output data. The result
+is clean (audio and/or video) data coming out of the stream.
+
+## Writer()
+
+The `Writer` class is a duplex stream that accepts raw audio/video data and
+passes it through untouched. It also has a `queue()` function that will
+queue the Writer to inject the metadata into the stream at the next "metaint"
+interval.
+
+### Writer#queue(metadata)
+
+Queues a piece of metadata to be sent along with the stream.
+`metadata` may be a String and be any title (up to 4066 chars),
+or may be an Object containing at least a "StreamTitle" key, with a String
+value. The serialized metadata payload must be <= 4080 bytes.
+
+## parse()
+
+Parses a Buffer (or String) containing Icecast metadata into an Object.
+
+## stringify()
+
+The `stringify` function takes an Object and converts it into an Icecast
+metadata string.
 
 [NodeJS]: http://nodejs.org
 [Icecast]: http://icecast.org
