@@ -20,14 +20,13 @@ describe('Reader', function () {
       assert.equal('hello world\0\0\0\0\0', metadata.toString('utf8'));
       called = true;
     });
-    var output = '';
-    r.setEncoding('utf8');
+    var output = [];
     r.on('data', function (b) {
-      output += b;
+      output.push(b);
     });
     r.on('end', function () {
       assert(called);
-      assert.equal('hello world', output);
+      assert.equal('hello world', Buffer.concat(output).toString());
       done();
     });
     r.end(data);
