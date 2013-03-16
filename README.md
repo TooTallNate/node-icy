@@ -41,6 +41,8 @@ and metadata events to _stderr_:
 
 ``` javascript
 var icecast = require('icecast');
+var lame = require('lame');
+var Speaker = require('speaker');
 
 // URL to a known Icecast stream
 var url = 'http://radio.nugs.net:8002';
@@ -57,8 +59,11 @@ icecast.get(url, function (res) {
     console.error(parsed);
   });
 
-  // pipe the audio data to `stdout`
-  res.pipe(process.stdout);
+  // Let's play the music. lame decodes and Speaker sends to speakers!
+  res.pipe(new lame.Decoder()).on('format', function (format) {
+    console.log('format', format);
+    this.pipe(new Speaker(format));
+  });
 });
 ```
 
