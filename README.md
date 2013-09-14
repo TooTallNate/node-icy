@@ -40,8 +40,8 @@ stream, pipe the clean audio data to _stdout_, and print the HTTP response heade
 and metadata events to _stderr_:
 
 ``` javascript
-var icecast = require('icecast');
 var lame = require('lame');
+var icecast = require('icecast');
 var Speaker = require('speaker');
 
 // URL to a known Icecast stream
