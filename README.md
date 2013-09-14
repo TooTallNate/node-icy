@@ -59,11 +59,10 @@ icecast.get(url, function (res) {
     console.error(parsed);
   });
 
-  // Let's play the music. lame decodes and Speaker sends to speakers!
-  res.pipe(new lame.Decoder()).on('format', function (format) {
-    console.log('format', format);
-    this.pipe(new Speaker(format));
-  });
+  // Let's play the music (assuming MP3 data).
+  // lame decodes and Speaker sends to speakers!
+  res.pipe(new lame.Decoder())
+     .pipe(new Speaker());
 });
 ```
 
