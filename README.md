@@ -45,7 +45,7 @@ var icecast = require('icecast');
 var Speaker = require('speaker');
 
 // URL to a known Icecast stream
-var url = 'http://radio.nugs.net:8002';
+var url = 'http://firewall.pulsradio.com';
 
 // connect to the remote stream
 icecast.get(url, function (res) {
