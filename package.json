@@ -15,7 +15,6 @@
   ],
   "dependencies": {
     "debug": "*",
-    "event-hijack": "*",
     "stream-parser": "*",
     "readable-stream": "*"
   },
