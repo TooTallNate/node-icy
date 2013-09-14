@@ -25,7 +25,7 @@ var icecast = require('../');
  * The Icecast stream URL to connect to.
  */
 
-var url = process.argv[2] || 'http://radio.nugs.net:8002';
+var url = process.argv[2] || 'http://firewall.pulsradio.com';
 
 /**
  * Send a GET http request to the specified Icecast URL.
