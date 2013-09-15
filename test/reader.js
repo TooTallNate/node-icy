@@ -32,7 +32,7 @@ describe('Reader', function () {
     r.end(data);
   });
 
-  describe('4EverFloyd-1-8192.mp3', function () {
+  describe('fixtures: 4EverFloyd-1-8192.mp3', function () {
     var metaint = 8192;
     var fixture = path.resolve(__dirname, 'fixtures', '4EverFloyd-1-8192.mp3');
 
@@ -52,7 +52,7 @@ describe('Reader', function () {
 
   });
 
-  describe('4EverFloyd-2-8192.mp3', function () {
+  describe('fixtures: 4EverFloyd-2-8192.mp3', function () {
     var metaint = 8192;
     var fixture = path.resolve(__dirname, 'fixtures', '4EverFloyd-2-8192.mp3');
 
