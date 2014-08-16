@@ -1,6 +1,7 @@
 
 var icecast = require('../');
 var assert = require('assert');
+var Iconv = require('iconv').Iconv;
 
 describe('metadata parser', function () {
 
@@ -40,6 +41,15 @@ describe('metadata parser', function () {
     assert.equal(euro.toString('utf8'), output.StreamTitle);
     assert.equal(cent.toString('utf8'), output.StreamUrl);
     assert.deepEqual([ 'StreamTitle', 'StreamUrl' ], Object.keys(output));
+  });
+
+  it('should parse the metadata and convert it to utf-8 if encoding provided', function () {
+    var iconv = new Iconv('UTF-8', 'CP1251');
+    var input = iconv.convert('StreamTitle=\'Русский текст\'');
+    var output = icecast.parse(input, 'CP1251');
+    assert.equal('object', typeof output);
+    assert.equal('Русский текст', output.StreamTitle);
+    assert.deepEqual([ 'StreamTitle' ], Object.keys(output));
   });
 
 });

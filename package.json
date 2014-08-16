@@ -16,6 +16,7 @@
   ],
   "dependencies": {
     "debug": "*",
+    "iconv": "*",
     "stream-parser": "*",
     "readable-stream": "*"
   },
