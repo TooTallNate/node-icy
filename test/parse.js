@@ -44,10 +44,10 @@ describe('metadata parser', function () {
   });
 
   it('should parse the metadata and convert it to utf-8 if encoding provided', function () {
-    var input = iconv.encode('StreamTitle=\'Русский текст\'', 'win1251');
+    var input = iconv.encode('StreamTitle=\'Some non-utf8 string\'', 'win1251');
     var output = icecast.parse(input, 'win1251');
     assert.equal('object', typeof output);
-    assert.equal('Русский текст', output.StreamTitle);
+    assert.equal('Some non-utf8 string', output.StreamTitle);
     assert.deepEqual([ 'StreamTitle' ], Object.keys(output));
   });
 
