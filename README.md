@@ -130,7 +130,12 @@ value. The serialized metadata payload must be <= 4080 bytes.
 
 ## parse()
 
-Parses a Buffer (or String) containing Icecast metadata into an Object.
+Parses a Buffer (or String) containing Icecast metadata into an Object. If metadata has encoding
+different than `utf-8`, pass a second argument with the [name of this encoding](https://github.com/ashtuchkin/iconv-lite/wiki/Supported-Encodings). For example:
+
+``` javascript
+var parsed = icecast.parse(metadata, 'win1251');
+```
 
 ## stringify()
 
