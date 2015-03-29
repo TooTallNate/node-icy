@@ -1,7 +1,7 @@
 node-icecast
 ============
-### NodeJS module for parsing and/or injecting metadata into SHOUTcast/Icecast radio streams
-[![Build Status](https://secure.travis-ci.org/TooTallNate/node-icecast.png)](http://travis-ci.org/TooTallNate/node-icecast)
+### Node.js module for parsing and/or injecting metadata into SHOUTcast/Icecast radio streams
+[![Build Status](https://travis-ci.org/TooTallNate/node-icecast.svg?branch=master)](https://travis-ci.org/TooTallNate/node-icecast)
 
 This module offers a `Reader` class for retrieving the raw audio data and
 parsing the metadata from a [SHOUTcast][] or [Icecast][] broadcast.
@@ -136,6 +136,5 @@ Parses a Buffer (or String) containing Icecast metadata into an Object.
 
 Takes an Object and converts it into an Icecast metadata string.
 
-[NodeJS]: http://nodejs.org
 [Icecast]: http://icecast.org
 [SHOUTcast]: http://www.shoutcast.com
