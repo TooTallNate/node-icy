@@ -1,13 +1,14 @@
-node-icecast
-============
-### Node.js module for parsing and/or injecting metadata into SHOUTcast/Icecast radio streams
-[![Build Status](https://travis-ci.org/TooTallNate/node-icecast.svg?branch=master)](https://travis-ci.org/TooTallNate/node-icecast)
+node-icy
+========
+### Node.js module for parsing and/or injecting [ICY metadata][protocol]
+[![Build Status](https://travis-ci.org/TooTallNate/node-icy.svg?branch=master)](https://travis-ci.org/TooTallNate/node-icy)
 
 This module offers a `Reader` class for retrieving the raw audio data and
-parsing the metadata from a [SHOUTcast][] or [Icecast][] broadcast.
+parsing the metadata from an ICY stream (commonly [SHOUTcast][] or
+[Icecast][] broadcasts).
 
 There's also a `Writer` class that allows you to inject your own metadata into a
-data stream, which can then be displayed by another Icecast client (like VLC).
+data stream, which can then be displayed by another ICY client (like VLC).
 
 But you'll probably be most interested in the `Client` class that builds off of
 node's core `http` module, except this version works with servers that return
@@ -28,34 +29,34 @@ Installation
 Install with `npm`:
 
 ``` bash
-$ npm install icecast
+$ npm install icy
 ```
 
 
 Example
 -------
 
-Here's a basic example of using the HTTP `Client` to connect to a remote Icecast
+Here's a basic example of using the HTTP `Client` to connect to a remote ICY
 stream, pipe the clean audio data to _stdout_, and print the HTTP response headers
 and metadata events to _stderr_:
 
 ``` javascript
+var icy = require('icy');
 var lame = require('lame');
-var icecast = require('icecast');
 var Speaker = require('speaker');
 
-// URL to a known Icecast stream
+// URL to a known ICY stream
 var url = 'http://firewall.pulsradio.com';
 
 // connect to the remote stream
-icecast.get(url, function (res) {
+icy.get(url, function (res) {
 
   // log the HTTP response headers
   console.error(res.headers);
 
   // log any "metadata" events that happen
   res.on('metadata', function (metadata) {
-    var parsed = icecast.parse(metadata);
+    var parsed = icy.parse(metadata);
     console.error(parsed);
   });
 
@@ -88,10 +89,10 @@ because of the strictness of node's HTTP parser. I'll volley for ICY to be
 supported (or at least configurable) in the http header for the JavaScript
 HTTP rewrite (v0.12 of node?).
 
-The other big difference is that it passes an `icecast.Reader` instance
+The other big difference is that it passes an `icy.Reader` instance
 instead of a `http.ClientResponse` instance to the "response" event callback,
 so that the "metadata" events are automatically parsed and the raw audio stream
-it output without the Icecast bytes.
+it output without the ICY bytes.
 
 Also see the [`request()`](#request) and [`get()`](#get) convenience functions.
 
@@ -99,18 +100,18 @@ Also see the [`request()`](#request) and [`get()`](#get) convenience functions.
 
 `request()` convenience function. Similar to node core's
 [`http.request()`](http://nodejs.org/docs/latest/api/http.html#http_http_request_options_callback),
-except it returns an `icecast.Client` instance.
+except it returns an `icy.Client` instance.
 
 ## get()
 
 `get()` convenience function. Similar to node core's
 [`http.get()`](http://nodejs.org/docs/latest/api/http.html#http_http_get_options_callback),
-except it returns an `icecast.Client` instance with `.end()` called on it and
+except it returns an `icy.Client` instance with `.end()` called on it and
 no request body written to it (the most common scenario).
 
 ## Reader()
 
-Icecast stream reader. This is a duplex stream that emits "metadata" events in
+ICY stream reader. This is a duplex stream that emits "metadata" events in
 addition to stripping out the metadata itself from the output data. The result
 is clean (audio and/or video) data coming out of the stream.
 
@@ -130,11 +131,12 @@ value. The serialized metadata payload must be <= 4080 bytes.
 
 ## parse()
 
-Parses a Buffer (or String) containing Icecast metadata into an Object.
+Parses a Buffer (or String) containing ICY metadata into an Object.
 
 ## stringify()
 
-Takes an Object and converts it into an Icecast metadata string.
+Takes an Object and converts it into an ICY metadata string.
 
+[protocol]: http://www.smackfu.com/stuff/programming/shoutcast.html
 [Icecast]: http://icecast.org
 [SHOUTcast]: http://www.shoutcast.com

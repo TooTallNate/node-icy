@@ -5,13 +5,13 @@
 
 var fs = require('fs');
 var path = require('path');
-var icecast = require('../');
+var icy = require('../');
 var assert = require('assert');
 
 describe('Writer', function () {
 
   it('should work with a "metaint" of 1', function (done) {
-    var w = new icecast.Writer(1);
+    var w = new icy.Writer(1);
     var output = [];
     w.on('data', function (b) {
       output.push(b);

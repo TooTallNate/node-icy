@@ -1,10 +1,10 @@
 
 /**
- * A very simple example of using the `icecast.get()` function, which parallels
+ * A very simple example of using the `icy.get()` function, which parallels
  * node's core `http.get()` function. The main difference is that this client
  * works as expected with servers that respond with the "ICY" http version.
  *
- * The `icecast.Client` class also ensures that the "Icy-MetaData" header gets
+ * The `icy.Client` class also ensures that the "Icy-MetaData" header gets
  * sent, and the "res" object in the response callback also emits "metadata"
  * events.
  */
@@ -19,19 +19,19 @@ if (process.stdout.isTTY) {
  * Module dependencies.
  */
 
-var icecast = require('../');
+var icy = require('../');
 
 /**
- * The Icecast stream URL to connect to.
+ * The ICY stream URL to connect to.
  */
 
 var url = process.argv[2] || 'http://firewall.pulsradio.com';
 
 /**
- * Send a GET http request to the specified Icecast URL.
+ * Send a GET http request to the specified ICY URL.
  */
 
-icecast.get(url, function (res) {
+icy.get(url, function (res) {
 
   // log out the HTTP headers
   console.error(res.headers);
@@ -48,7 +48,7 @@ icecast.get(url, function (res) {
  */
 
 function onMetadata (metadata) {
-  metadata = icecast.parse(metadata);
+  metadata = icy.parse(metadata);
   console.error('METADATA EVENT:');
   console.error(metadata);
 }

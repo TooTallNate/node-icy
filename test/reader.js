@@ -5,14 +5,14 @@
 
 var fs = require('fs');
 var path = require('path');
-var icecast = require('../');
+var icy = require('../');
 var assert = require('assert');
 
 describe('Reader', function () {
 
   it('should work with a "metaint" of 1', function (done) {
     var data = 'h\0e\0l\0l\u0001hello world\0\0\0\0\0o\0 \0w\0o\0r\0l\0d';
-    var r = new icecast.Reader(1);
+    var r = new icy.Reader(1);
     var called = false;
     r.on('metadata', function (metadata) {
       assert(Buffer.isBuffer(metadata));
@@ -38,7 +38,7 @@ describe('Reader', function () {
 
     it('should emit one "metadata" event', function (done) {
       var file = fs.createReadStream(fixture);
-      var reader = new icecast.Reader(8192);
+      var reader = new icy.Reader(8192);
       var called = false;
       reader.on('metadata', function (metadata) {
         assert(!called);
@@ -58,7 +58,7 @@ describe('Reader', function () {
 
     it('should emit one "metadata" event', function (done) {
       var file = fs.createReadStream(fixture);
-      var reader = new icecast.Reader(8192);
+      var reader = new icy.Reader(8192);
       var called = false;
       reader.on('metadata', function (metadata) {
         assert(!called);

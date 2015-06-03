@@ -6,7 +6,7 @@
 var fs = require('fs');
 var net = require('net');
 var path = require('path');
-var icecast = require('../');
+var icy = require('../');
 var assert = require('assert');
 
 describe('Client', function () {
@@ -17,7 +17,7 @@ describe('Client', function () {
         fs.createReadStream(file).pipe(socket);
       });
       server.listen(function () {
-        var req = icecast.request({
+        var req = icy.request({
           method: 'GET',
           host: '127.0.0.1',
           port: server.address().port,
@@ -41,7 +41,7 @@ describe('Client', function () {
         fs.createReadStream(file).pipe(socket);
       });
       server.listen(function () {
-        var req = icecast.request({
+        var req = icy.request({
           method: 'GET',
           host: '127.0.0.1',
           port: server.address().port,
@@ -53,7 +53,7 @@ describe('Client', function () {
           assert.equal('1', res.headers['icy-pub']);
           assert.equal('32768', res.headers['icy-metaint']);
           res.on('metadata', function (metadata) {
-            var m = icecast.parse(metadata);
+            var m = icy.parse(metadata);
             assert.deepEqual(m, { StreamTitle: 'Johanna - Alive (Greg B Remix)', StreamUrl: '' });
             done();
           });
