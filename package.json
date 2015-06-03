@@ -15,9 +15,9 @@
     "stream"
   ],
   "dependencies": {
-    "debug": "*",
-    "stream-parser": "*",
-    "readable-stream": "*"
+    "debug": "2",
+    "readable-stream": "1.0",
+    "stream-parser": "~0.3.0"
   },
   "devDependencies": {
     "mocha": "*"
