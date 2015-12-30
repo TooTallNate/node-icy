@@ -95,32 +95,4 @@ describe('Client', function () {
         });
       });
     });
-
-  describe('fixtures: icy-server-https-string-response', function () {
-      it('should not get a Parse Error with https server', function (done) {
-        var options = {
-            key: fs.readFileSync('test/fixtures/key.pem'),
-            cert: fs.readFileSync('test/fixtures/cert.pem')
-        };
-        //Since this testcase test icy.request as string then we have to globally
-        //allow unauthorized TLS
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; //Self signed certificate
-        var server = tls.createServer(options, function (socket) {
-          var file = path.resolve(__dirname, 'fixtures', 'icy-server-response');
-          fs.createReadStream(file).pipe(socket);
-        });
-        server.listen(function () {
-          var req = icy.request('https://127.0.0.1:'+server.address().port,
-                                function (res) {
-            assert.equal('ICY', res.httpVersion);
-            assert.equal('192', res.headers['icy-br']);
-            assert.equal('1', res.headers['icy-pub']);
-            res.resume();
-            server.close();
-            done();
-          });
-          req.end();
-        });
-      });
-    });
 });
