@@ -71,8 +71,6 @@ describe('Client', function () {
             key: fs.readFileSync('test/fixtures/key.pem'),
             cert: fs.readFileSync('test/fixtures/cert.pem')
         };
-        //Self signed certificate
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
         var server = tls.createServer(options, function (socket) {
           var file = path.resolve(__dirname, 'fixtures', 'icy-server-response');
           fs.createReadStream(file).pipe(socket);
@@ -81,6 +79,7 @@ describe('Client', function () {
           var req = icy.request({
             method: 'GET',
             protocol: 'https:',
+            rejectUnauthorized: false, //Self signed certificate
             host: '127.0.0.1',
             port: server.address().port,
             path: '/'
@@ -103,8 +102,9 @@ describe('Client', function () {
             key: fs.readFileSync('test/fixtures/key.pem'),
             cert: fs.readFileSync('test/fixtures/cert.pem')
         };
-        //Self signed certificate
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+        //Since this testcase test icy.request as string then we have to globally
+        //allow unauthorized TLS
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; //Self signed certificate
         var server = tls.createServer(options, function (socket) {
           var file = path.resolve(__dirname, 'fixtures', 'icy-server-response');
           fs.createReadStream(file).pipe(socket);
