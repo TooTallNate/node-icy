@@ -68,8 +68,8 @@ describe('Client', function () {
   describe('fixtures: icy-server-https-response', function () {
       it('should not get a Parse Error with https server', function (done) {
         var options = {
-            key: fs.readFileSync('test/fixtures/key.pem'),
-            cert: fs.readFileSync('test/fixtures/cert.pem')
+            key: fs.readFileSync(__dirname + '/fixtures/ssl-cert-snakeoil.key'),
+            cert: fs.readFileSync(__dirname + '/fixtures/ssl-cert-snakeoil.pem')
         };
         var server = tls.createServer(options, function (socket) {
           var file = path.resolve(__dirname, 'fixtures', 'icy-server-response');
