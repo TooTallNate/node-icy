@@ -5,6 +5,7 @@
 
 var fs = require('fs');
 var net = require('net');
+var tls = require('tls');
 var path = require('path');
 var icy = require('../');
 var assert = require('assert');
@@ -64,4 +65,34 @@ describe('Client', function () {
       });
     });
   });
+  describe('fixtures: icy-server-https-response', function () {
+      it('should not get a Parse Error with https server', function (done) {
+        var options = {
+            key: fs.readFileSync('test/fixtures/key.pem'),
+            cert: fs.readFileSync('test/fixtures/cert.pem')
+        };
+        var server = tls.createServer(options, function (socket) {
+          var file = path.resolve(__dirname, 'fixtures', 'icy-server-response');
+          fs.createReadStream(file).pipe(socket);
+        });
+        server.listen(function () {
+          var req = icy.request({
+            method: 'GET',
+            protocol: 'https:',
+            rejectUnauthorized: false, //Self signed certificate
+            host: '127.0.0.1',
+            port: server.address().port,
+            path: '/'
+          }, function (res) {
+            assert.equal('ICY', res.httpVersion);
+            assert.equal('192', res.headers['icy-br']);
+            assert.equal('1', res.headers['icy-pub']);
+            res.resume();
+            server.close();
+            done();
+          });
+          req.end();
+        });
+      });
+    });
 });
