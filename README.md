@@ -67,6 +67,20 @@ icy.get(url, function (res) {
 });
 ```
 
+You are also able to add custom headers to your request:
+```javascript
+var url = require('url');
+
+// URL to a known ICY stream
+var opts = url.parse('http://yourstreamurl.tld/');
+
+// add custom headers
+opts.headers = { 'User-Agent': 'Your awesome useragent' };
+
+// connect to the remote stream
+icy.get(opts, callback);
+```
+
 
 API
 ---
