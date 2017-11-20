@@ -42,4 +42,13 @@ describe('metadata parser', function () {
     assert.deepEqual([ 'StreamTitle', 'StreamUrl' ], Object.keys(output));
   });
 
+  // https://github.com/TooTallNate/node-icy/issues/32
+  it('should parse the metadata into an Object 4', function () {
+    var input = 'StreamTitle=\'Taio Cruz - text="Dynamite" song_spot="M" MediaBaseId="1734278" itunesTrackId="0" amgTrackId="-1" amgArtistId="0" TAID="43011" TPID="7610716" cartcutId="0708213001"\';'
+    var output = icy.parse(input);
+    assert.equal('object', typeof output);
+    assert.equal('Taio Cruz - text="Dynamite" song_spot="M" MediaBaseId="1734278" itunesTrackId="0" amgTrackId="-1" amgArtistId="0" TAID="43011" TPID="7610716" cartcutId="0708213001"', output.StreamTitle);
+    assert.deepEqual([ 'StreamTitle' ], Object.keys(output));
+  });
+
 });
