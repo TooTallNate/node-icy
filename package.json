@@ -19,6 +19,7 @@
   ],
   "dependencies": {
     "debug": "2",
+    "follow-redirects": "^1.7.0",
     "readable-stream": "2",
     "stream-parser": "^0.3.1"
   },
