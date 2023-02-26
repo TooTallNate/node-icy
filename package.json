@@ -1,11 +1,11 @@
 {
-  "name": "icy",
+  "name": "ecma-iceclient",
   "description": "Node.js module for parsing and/or injecting ICY metadata",
-  "version": "2.1.0",
+  "version": "2.5.0",
   "author": "Nathan Rajlich <nathan@tootallnate.net>",
   "repository": {
     "type": "git",
-    "url": "git://github.com/TooTallNate/node-icy.git"
+    "url": "git://github.com/mo-g/ecme-iceclient.git"
   },
   "license": "MIT",
   "keywords": [
@@ -23,6 +23,16 @@
     "readable-stream": "2",
     "stream-parser": "^0.3.1"
   },
+  "contributors": [
+    "mo-g <mo-g@spindoctor.dev> (https://github.com/mo-g)",
+    "ZaidulinKirill <zaidulinkirill@gmail.com>",
+    "Brandon Roberson <broberson@gmail.com>",
+    "Benjamin Leuckefeld <code@deratrox.de>",
+    "Angel Nunez Mencias <ANUNEZ@de.ibm.com>",
+    "julien <julien.genestoux@gmail.com>",
+    "Michael Hanney <mhanney@atomicpunk.(none)>",
+    "Alexander Shtuchkin <ashtuchkin@gmail.com>"
+  ],
   "devDependencies": {
     "mocha": "*"
   },
