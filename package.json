@@ -1,7 +1,7 @@
 {
   "name": "ecma-iceclient",
   "description": "Node.js module for parsing and/or injecting ICY metadata",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "author": "Nathan Rajlich <nathan@tootallnate.net>",
   "repository": {
     "type": "git",
@@ -31,7 +31,8 @@
     "Angel Nunez Mencias <ANUNEZ@de.ibm.com>",
     "julien <julien.genestoux@gmail.com>",
     "Michael Hanney <mhanney@atomicpunk.(none)>",
-    "Alexander Shtuchkin <ashtuchkin@gmail.com>"
+    "Alexander Shtuchkin <ashtuchkin@gmail.com>",
+    "Exhabition <lukeweerheim@hotmail.com>"
   ],
   "devDependencies": {
     "mocha": "*"
